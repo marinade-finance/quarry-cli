@@ -1,10 +1,5 @@
 export {};
 
-declare module 'jest-shell-matchers' {
-  import * as shellMatchers from 'jest-shell-matchers';
-  export = shellMatchers;
-}
-
 declare global {
   namespace jest {
     interface Matchers<R> {
