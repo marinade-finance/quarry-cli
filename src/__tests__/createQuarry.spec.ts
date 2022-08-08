@@ -11,7 +11,7 @@ import BN from 'bn.js';
 import { fs } from 'mz';
 import { parseKeypair } from '../keyParser';
 import { waitForSuccess } from '../testHelpers/waitForSuccess';
-import shellMatchers = require('jest-shell-matchers');
+import shellMatchers from 'jest-shell-matchers';
 import { file } from 'tmp-promise';
 
 jest.setTimeout(300000);
