@@ -1,7 +1,6 @@
 import { findTransactionAddress, GokiSDK } from '@gokiprotocol/client';
 import {
   QuarrySDK,
-  QuarryWrapper,
   RewarderWrapper,
 } from '@quarryprotocol/quarry-sdk';
 import { SignerWallet, SolanaProvider } from '@saberhq/solana-contrib';
@@ -10,7 +9,6 @@ import { Connection, Keypair } from '@solana/web3.js';
 import BN from 'bn.js';
 import { fs } from 'mz';
 import { parseKeypair } from '../keyParser';
-import { waitForSuccess } from '../testHelpers/waitForSuccess';
 import shellMatchers from 'jest-shell-matchers';
 import { file } from 'tmp-promise';
 
@@ -30,7 +28,7 @@ describe('create-quarry', () => {
 
   beforeAll(async () => {
     const provider = SolanaProvider.init({
-      connection: new Connection('http://localhost:8899'),
+      connection: new Connection('http://localhost:8899', 'confirmed'),
       wallet: new SignerWallet(await parseKeypair('~/.config/solana/id.json')),
     });
     quarry = QuarrySDK.load({ provider });
@@ -59,11 +57,7 @@ describe('create-quarry', () => {
     );
     tx.addSigners(mintKeypair);
     await tx.confirm();
-    await waitForSuccess({
-      f: async () => {
-        rewarderWrapper = await quarry.mine.loadRewarderWrapper(rewarderKey);
-      },
-    });
+    rewarderWrapper = await quarry.mine.loadRewarderWrapper(rewarderKey);
   });
 
   it('Runs with minimal parameters', async () => {
@@ -79,17 +73,12 @@ describe('create-quarry', () => {
       ],
     ]).toHaveMatchingSpawnOutput(0);
 
-    await expect(
-      waitForSuccess({
-        f: async () => {
-          const quarryWrapper = await rewarderWrapper.getQuarry(
-            Token.fromMint(mintKeypair.publicKey, 9)
-          );
-          return quarryWrapper.quarryData.tokenMintKey.toBase58();
-        },
-        wait: 40000,
-      })
-    ).resolves.toBe(mintKeypair.publicKey.toBase58());
+    const quarryWrapper = await rewarderWrapper.getQuarry(
+      Token.fromMint(mintKeypair.publicKey, 9)
+    );
+    expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
+      mintKeypair.publicKey.toBase58()
+    );
   });
 
   it('Runs with filesystem wallet admin', async () => {
@@ -111,18 +100,8 @@ describe('create-quarry', () => {
     );
     tx.addSigners(admin);
     await tx.confirm();
-    await waitForSuccess({
-      f: async () => {
-        rewarderWrapper = await quarry.mine.loadRewarderWrapper(
-          rewarderWrapper.rewarderKey
-        );
-        if (!rewarderWrapper.rewarderData.authority.equals(admin.publicKey)) {
-          throw Error('Not updated yet');
-        }
-      },
-    });
 
-    expect([
+    await expect([
       'pnpm',
       [
         'cli',
@@ -136,16 +115,12 @@ describe('create-quarry', () => {
       ],
     ]).toHaveMatchingSpawnOutput(0);
 
-    await expect(
-      waitForSuccess({
-        f: async () => {
-          const quarryWrapper = await rewarderWrapper.getQuarry(
-            Token.fromMint(mintKeypair.publicKey, 9)
-          );
-          return quarryWrapper.quarryData.tokenMintKey.toBase58();
-        },
-      })
-    ).resolves.toBe(mintKeypair.publicKey.toBase58());
+    const quarryWrapper = await rewarderWrapper.getQuarry(
+      Token.fromMint(mintKeypair.publicKey, 9)
+    );
+    expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
+      mintKeypair.publicKey.toBase58()
+    );
     await cleanup();
   });
 
@@ -159,13 +134,6 @@ describe('create-quarry', () => {
     });
     const tx = transferTx.combine(createOperatorTx);
     await tx.confirm();
-    await waitForSuccess({
-      f: async () => {
-        if (!(await quarry.loadOperator(operatorAddress))) {
-          throw Error('Not created yet');
-        }
-      },
-    });
 
     await expect([
       'pnpm',
@@ -179,16 +147,12 @@ describe('create-quarry', () => {
       ],
     ]).toHaveMatchingSpawnOutput(0);
 
-    await expect(
-      waitForSuccess({
-        f: async () => {
-          const quarryWrapper = await rewarderWrapper.getQuarry(
-            Token.fromMint(mintKeypair.publicKey, 9)
-          );
-          return quarryWrapper.quarryData.tokenMintKey.toBase58();
-        },
-      })
-    ).resolves.toBe(mintKeypair.publicKey.toBase58());
+    const quarryWrapper = await rewarderWrapper.getQuarry(
+      Token.fromMint(mintKeypair.publicKey, 9)
+    );
+    expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
+      mintKeypair.publicKey.toBase58()
+    );
   });
 
   it('Runs with filesystem wallet operator', async () => {
@@ -215,15 +179,8 @@ describe('create-quarry', () => {
         .instruction()
     );
     await tx.confirm();
-    await waitForSuccess({
-      f: async () => {
-        if (!(await quarry.loadOperator(operatorAddress))) {
-          throw Error('Not created yet');
-        }
-      },
-    });
 
-    expect([
+    await expect([
       'pnpm',
       [
         'cli',
@@ -237,16 +194,12 @@ describe('create-quarry', () => {
       ],
     ]).toHaveMatchingSpawnOutput(0);
 
-    await expect(
-      waitForSuccess({
-        f: async () => {
-          const quarryWrapper = await rewarderWrapper.getQuarry(
-            Token.fromMint(mintKeypair.publicKey, 9)
-          );
-          return quarryWrapper.quarryData.tokenMintKey.toBase58();
-        },
-      })
-    ).resolves.toBe(mintKeypair.publicKey.toBase58());
+    const quarryWrapper = await rewarderWrapper.getQuarry(
+      Token.fromMint(mintKeypair.publicKey, 9)
+    );
+    expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
+      mintKeypair.publicKey.toBase58()
+    );
     await cleanup();
   });
 
@@ -264,9 +217,6 @@ describe('create-quarry', () => {
       })
       .combine(newSmartWalletTx);
     await tx.confirm();
-    await waitForSuccess({
-      f: () => goki.loadSmartWallet(smartWalletWrapper.key),
-    });
 
     const { transactionKey: acceptAuthorityTxAddress, tx: acceptAuthorityTx } =
       await smartWalletWrapper.newTransaction({
@@ -281,31 +231,11 @@ describe('create-quarry', () => {
         ],
       });
     await acceptAuthorityTx.confirm();
-    await waitForSuccess({
-      f: async () => {
-        if (!(await smartWalletWrapper.reloadData()).numTransactions.eqn(1)) {
-          throw new Error('Not created yet');
-        }
-      },
-    });
 
     tx = await smartWalletWrapper.executeTransaction({
       transactionKey: acceptAuthorityTxAddress,
     });
     await tx.confirm();
-
-    await waitForSuccess({
-      f: async () => {
-        rewarderWrapper = await quarry.mine.loadRewarderWrapper(
-          rewarderWrapper.rewarderKey
-        );
-        if (
-          !rewarderWrapper.rewarderData.authority.equals(smartWalletWrapper.key)
-        ) {
-          throw Error('Not updated yet');
-        }
-      },
-    });
 
     await expect([
       'pnpm',
@@ -319,17 +249,8 @@ describe('create-quarry', () => {
       ],
     ]).toHaveMatchingSpawnOutput(0);
 
-    await expect(
-      waitForSuccess({
-        f: async () => {
-          const smartWalletData = await smartWalletWrapper.reloadData();
-          if (!smartWalletData.numTransactions.eqn(2)) {
-            throw new Error('Not created yet');
-          }
-          return true;
-        },
-      })
-    ).resolves.toBeTruthy();
+    const smartWalletData = await smartWalletWrapper.reloadData();
+    expect(smartWalletData.numTransactions.eqn(2)).toBeTruthy();
 
     tx = await smartWalletWrapper.executeTransaction({
       transactionKey: (
@@ -337,16 +258,12 @@ describe('create-quarry', () => {
       )[0],
     });
     await tx.confirm();
-    await expect(
-      waitForSuccess({
-        f: async () => {
-          const quarryWrapper = await rewarderWrapper.getQuarry(
-            Token.fromMint(mintKeypair.publicKey, 9)
-          );
-          return quarryWrapper.quarryData.tokenMintKey.toBase58();
-        },
-      })
-    ).resolves.toBe(mintKeypair.publicKey.toBase58());
+    const quarryWrapper = await rewarderWrapper.getQuarry(
+      Token.fromMint(mintKeypair.publicKey, 9)
+    );
+    expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
+      mintKeypair.publicKey.toBase58()
+    );
   });
 
   it('Uses GOKI with filesystem proposer', async () => {
@@ -370,9 +287,6 @@ describe('create-quarry', () => {
       })
       .combine(newSmartWalletTx);
     await tx.confirm();
-    await waitForSuccess({
-      f: () => goki.loadSmartWallet(smartWalletWrapper.key),
-    });
 
     const { transactionKey: acceptAuthorityTxAddress, tx: acceptAuthorityTx } =
       await smartWalletWrapper.newTransaction({
@@ -389,13 +303,6 @@ describe('create-quarry', () => {
       });
     acceptAuthorityTx.addSigners(proposer);
     await acceptAuthorityTx.confirm();
-    await waitForSuccess({
-      f: async () => {
-        if (!(await smartWalletWrapper.reloadData()).numTransactions.eqn(1)) {
-          throw new Error('Not created yet');
-        }
-      },
-    });
 
     tx = await smartWalletWrapper.executeTransaction({
       transactionKey: acceptAuthorityTxAddress,
@@ -403,19 +310,6 @@ describe('create-quarry', () => {
     });
     tx.addSigners(proposer);
     await tx.confirm();
-
-    await waitForSuccess({
-      f: async () => {
-        rewarderWrapper = await quarry.mine.loadRewarderWrapper(
-          rewarderWrapper.rewarderKey
-        );
-        if (
-          !rewarderWrapper.rewarderData.authority.equals(smartWalletWrapper.key)
-        ) {
-          throw Error('Not updated yet');
-        }
-      },
-    });
 
     await expect([
       'pnpm',
@@ -431,17 +325,8 @@ describe('create-quarry', () => {
       ],
     ]).toHaveMatchingSpawnOutput(0);
 
-    await expect(
-      waitForSuccess({
-        f: async () => {
-          const smartWalletData = await smartWalletWrapper.reloadData();
-          if (!smartWalletData.numTransactions.eqn(2)) {
-            throw new Error('Not created yet');
-          }
-          return true;
-        },
-      })
-    ).resolves.toBeTruthy();
+    const smartWalletData = await smartWalletWrapper.reloadData();
+    expect(smartWalletData.numTransactions.eqn(2)).toBeTruthy();
 
     tx = await smartWalletWrapper.executeTransaction({
       transactionKey: (
@@ -451,16 +336,12 @@ describe('create-quarry', () => {
     });
     tx.addSigners(proposer);
     await tx.confirm();
-    await expect(
-      waitForSuccess({
-        f: async () => {
-          const quarryWrapper = await rewarderWrapper.getQuarry(
-            Token.fromMint(mintKeypair.publicKey, 9)
-          );
-          return quarryWrapper.quarryData.tokenMintKey.toBase58();
-        },
-      })
-    ).resolves.toBe(mintKeypair.publicKey.toBase58());
+    const quarryWrapper = await rewarderWrapper.getQuarry(
+      Token.fromMint(mintKeypair.publicKey, 9)
+    );
+    expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
+      mintKeypair.publicKey.toBase58()
+    );
   });
 
   it('Uses GOKI with operator', async () => {
@@ -490,13 +371,6 @@ describe('create-quarry', () => {
         .instruction()
     );
     await tx.confirm();
-    await waitForSuccess({
-      f: async () => {
-        if (!(await quarry.loadOperator(operatorAddress))) {
-          throw Error('Not created yet');
-        }
-      },
-    });
 
     await expect([
       'pnpm',
@@ -510,17 +384,8 @@ describe('create-quarry', () => {
       ],
     ]).toHaveMatchingSpawnOutput(0);
 
-    await expect(
-      waitForSuccess({
-        f: async () => {
-          const smartWalletData = await smartWalletWrapper.reloadData();
-          if (!smartWalletData.numTransactions.eqn(1)) {
-            throw new Error('Not created yet');
-          }
-          return true;
-        },
-      })
-    ).resolves.toBeTruthy();
+    const smartWalletData = await smartWalletWrapper.reloadData();
+    expect(smartWalletData.numTransactions.eqn(1)).toBeTruthy();
 
     tx = await smartWalletWrapper.executeTransaction({
       transactionKey: (
@@ -528,15 +393,11 @@ describe('create-quarry', () => {
       )[0],
     });
     await tx.confirm();
-    await expect(
-      waitForSuccess({
-        f: async () => {
-          const quarryWrapper = await rewarderWrapper.getQuarry(
-            Token.fromMint(mintKeypair.publicKey, 9)
-          );
-          return quarryWrapper.quarryData.tokenMintKey.toBase58();
-        },
-      })
-    ).resolves.toBe(mintKeypair.publicKey.toBase58());
+    const quarryWrapper = await rewarderWrapper.getQuarry(
+      Token.fromMint(mintKeypair.publicKey, 9)
+    );
+    expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
+      mintKeypair.publicKey.toBase58()
+    );
   });
 });
