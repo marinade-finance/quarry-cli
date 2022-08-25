@@ -10,7 +10,7 @@ import { createInitMintInstructions, Token } from '@saberhq/token-utils';
 import { Connection, Keypair } from '@solana/web3.js';
 import BN from 'bn.js';
 import { fs } from 'mz';
-import { parseKeypair } from '../keyParser';
+import { parseKeypair } from '@marinade.finance/solana-cli-utils';
 import shellMatchers from 'jest-shell-matchers';
 import { file } from 'tmp-promise';
 import { MultisigHelper, MULTISIG_FACTORIES } from '../testHelpers/multisig';
@@ -76,7 +76,10 @@ describe('create-quarry', () => {
         '--stake',
         mintKeypair.publicKey.toBase58(),
       ],
-    ]).toHaveMatchingSpawnOutput(0);
+    ]).toHaveMatchingSpawnOutput({
+      code: 0,
+      stderr: '',
+    });
 
     const quarryWrapper = await rewarderWrapper.getQuarry(
       Token.fromMint(mintKeypair.publicKey, 9)
@@ -118,7 +121,10 @@ describe('create-quarry', () => {
         '--admin',
         adminPath,
       ],
-    ]).toHaveMatchingSpawnOutput(0);
+    ]).toHaveMatchingSpawnOutput({
+      code: 0,
+      stderr: '',
+    });
 
     const quarryWrapper = await rewarderWrapper.getQuarry(
       Token.fromMint(mintKeypair.publicKey, 9)
@@ -150,7 +156,10 @@ describe('create-quarry', () => {
         '--stake',
         mintKeypair.publicKey.toBase58(),
       ],
-    ]).toHaveMatchingSpawnOutput(0);
+    ]).toHaveMatchingSpawnOutput({
+      code: 0,
+      stderr: '',
+    });
 
     const quarryWrapper = await rewarderWrapper.getQuarry(
       Token.fromMint(mintKeypair.publicKey, 9)
@@ -197,7 +206,10 @@ describe('create-quarry', () => {
         '--admin',
         adminPath,
       ],
-    ]).toHaveMatchingSpawnOutput(0);
+    ]).toHaveMatchingSpawnOutput({
+      code: 0,
+      stderr: '',
+    });
 
     const quarryWrapper = await rewarderWrapper.getQuarry(
       Token.fromMint(mintKeypair.publicKey, 9)
@@ -211,7 +223,7 @@ describe('create-quarry', () => {
   const transferAuthority: (
     multisig: MultisigHelper
   ) => Promise<void> = async multisig => {
-    let tx = rewarderWrapper.transferAuthority({
+    const tx = rewarderWrapper.transferAuthority({
       nextAuthority: multisig.authority,
     });
     await tx.confirm();
@@ -248,7 +260,10 @@ describe('create-quarry', () => {
             '--stake',
             mintKeypair.publicKey.toBase58(),
           ],
-        ]).toHaveMatchingSpawnOutput(0);
+        ]).toHaveMatchingSpawnOutput({
+          code: 0,
+          stderr: '',
+        });
 
         await multisig.reload();
         expect(multisig.numTransactions.eqn(2)).toBeTruthy();
@@ -292,7 +307,10 @@ describe('create-quarry', () => {
             '--proposer',
             proposerPath,
           ],
-        ]).toHaveMatchingSpawnOutput(0);
+        ]).toHaveMatchingSpawnOutput({
+          code: 0,
+          stderr: '',
+        });
 
         await multisig.reload();
         expect(multisig.numTransactions.eqn(2)).toBeTruthy();
@@ -321,7 +339,7 @@ describe('create-quarry', () => {
         const transferTx = rewarderWrapper.transferAuthority({
           nextAuthority: operatorAddress,
         });
-        let tx = transferTx.combine(createOperatorTx);
+        const tx = transferTx.combine(createOperatorTx);
         tx.append(
           await quarry.programs.Operator.methods
             .setQuarryCreator()
@@ -344,7 +362,10 @@ describe('create-quarry', () => {
             '--stake',
             mintKeypair.publicKey.toBase58(),
           ],
-        ]).toHaveMatchingSpawnOutput(0);
+        ]).toHaveMatchingSpawnOutput({
+          code: 0,
+          stderr: '',
+        });
 
         await multisig.reload();
         expect(multisig.numTransactions.eqn(1)).toBeTruthy();

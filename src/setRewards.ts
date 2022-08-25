@@ -1,16 +1,16 @@
-import { GokiSDK, SmartWalletWrapper } from "@gokiprotocol/client";
+import { GokiSDK, SmartWalletWrapper } from '@gokiprotocol/client';
 import {
   Operator,
   QuarrySDK,
   RewarderWrapper,
-} from "@quarryprotocol/quarry-sdk";
-import { TransactionEnvelope } from "@saberhq/solana-contrib";
-import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import assert from "assert";
-import BN from "bn.js";
-import { Command } from "commander";
-import { useContext } from "./context";
-import { parseKeypair, parsePubkey } from "./keyParser";
+} from '@quarryprotocol/quarry-sdk';
+import { TransactionEnvelope } from '@saberhq/solana-contrib';
+import { Keypair, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
+import assert from 'assert';
+import BN from 'bn.js';
+import { Command } from 'commander';
+import { useContext } from './context';
+import { parseKeypair, parsePubkey } from '@marinade.finance/solana-cli-utils';
 
 export interface QuarryShare {
   mint: PublicKey;
@@ -19,20 +19,20 @@ export interface QuarryShare {
 
 export function installSetRewards(program: Command) {
   program
-    .command("set-rewards")
+    .command('set-rewards')
     .requiredOption(
-      "--rewarder <address>",
-      "Rewarder",
+      '--rewarder <address>',
+      'Rewarder',
       parsePubkey,
       Promise.resolve(
-        new PublicKey("J829VB5Fi7DMoMLK7bsVGFM82cRU61BKtiPz9PNFdL7b")
+        new PublicKey('J829VB5Fi7DMoMLK7bsVGFM82cRU61BKtiPz9PNFdL7b')
       )
     )
     .option(
-      "--share <mint:share...>",
-      "Quarry share",
+      '--share <mint:share...>',
+      'Quarry share',
       (value, acc: QuarryShare[] = []) => {
-        const [mint, share] = value.split(":");
+        const [mint, share] = value.split(':');
         acc.push({
           mint: new PublicKey(mint),
           share: new BN(share),
@@ -41,22 +41,18 @@ export function installSetRewards(program: Command) {
       }
     )
     .option(
-      "--rewards-per-share <value>",
-      "Rewards per share",
-      (value) => new BN(value)
+      '--rewards-per-share <value>',
+      'Rewards per share',
+      value => new BN(value)
     )
-    .option(
-      "--total-rewards <value>",
-      "Total rewards",
-      (value) => new BN(value)
-    )
-    .option("--daily", "Daily mode")
-    .option("--weekly", "Weekly mode")
-    .option("--annual", "Annual mode")
-    .option("--share-allocator <keypair>", "Share alloctor", parseKeypair)
-    .option("--rate-setter <keypair>", "Rate setter", parseKeypair)
-    .option("--rent-payer <keypair>", "Rent payer", parseKeypair)
-    .option("--proposer <keypair>", "Proposer", parseKeypair)
+    .option('--total-rewards <value>', 'Total rewards', value => new BN(value))
+    .option('--daily', 'Daily mode')
+    .option('--weekly', 'Weekly mode')
+    .option('--annual', 'Annual mode')
+    .option('--share-allocator <keypair>', 'Share alloctor', parseKeypair)
+    .option('--rate-setter <keypair>', 'Rate setter', parseKeypair)
+    .option('--rent-payer <keypair>', 'Rent payer', parseKeypair)
+    .option('--proposer <keypair>', 'Proposer', parseKeypair)
     .action(
       async ({
         rewarder,
@@ -90,13 +86,13 @@ export function installSetRewards(program: Command) {
         }
         if (weekly) {
           if (!multiplier.eq(new BN(1))) {
-            throw new Error("Only one of daily, weekly and annual must be set");
+            throw new Error('Only one of daily, weekly and annual must be set');
           }
           multiplier = new BN(52);
         }
         if (annual) {
           if (!multiplier.eq(new BN(1))) {
-            throw new Error("Only one of daily, weekly and annual must be set");
+            throw new Error('Only one of daily, weekly and annual must be set');
           }
         }
         await setRewards({
@@ -148,7 +144,7 @@ export async function setRewards({
   const quarries = await quarry.mine.program.account.quarry.all(
     rewarderWrapper.rewarderKey.toBuffer()
   );
-  const mints = quarries.map((quarry) => quarry.account.tokenMintKey);
+  const mints = quarries.map(quarry => quarry.account.tokenMintKey);
   const shareMap = new Map<string, BN>();
   for (const quarryWrapper of quarries) {
     shareMap.set(
@@ -167,7 +163,7 @@ export async function setRewards({
     if (rewardsPerShare !== undefined) {
       let totalShare = new BN(0);
 
-      shareMap.forEach((value) => {
+      shareMap.forEach(value => {
         totalShare = totalShare.add(value);
       });
       totalRewards = totalShare.mul(rewardsPerShare);
@@ -226,7 +222,7 @@ export async function setRewards({
         shareAllocatorSmartWallet = await goki.loadSmartWallet(
           shareAllocatorAuthority
         );
-        console.log("Using share allocator GOKI smart wallet");
+        console.log('Using share allocator GOKI smart wallet');
       } catch {
         /**/
       }
@@ -280,7 +276,7 @@ export async function setRewards({
       setSharesTx.addSigners(shareAllocator);
     } else if (shareAllocatorSmartWallet) {
       while (setSharesTx.instructions.length > 0) {
-        let testTx = new TransactionEnvelope(tx.provider, [
+        const testTx = new TransactionEnvelope(tx.provider, [
           ...setSharesTx.instructions,
         ]);
         do {
@@ -300,7 +296,7 @@ export async function setRewards({
             newTransactionTx.addSigners(rentPayer);
           }
           const estimation = newTransactionTx.estimateSize();
-          if ("size" in estimation) {
+          if ('size' in estimation) {
             console.log(
               `Creating GOKI tx #${index}) ${transactionKey.toBase58()}`
             );
@@ -322,7 +318,9 @@ export async function setRewards({
         }
       }
     } else if (!shareAllocatorAuthority.equals(quarry.provider.walletKey)) {
-      throw new Error(`Share allocator ${shareAllocatorAuthority.toBase58()} signature is required`);
+      throw new Error(
+        `Share allocator ${shareAllocatorAuthority.toBase58()} signature is required`
+      );
     }
     tx = tx.combine(setSharesTx); // must be empty if goki was used
   }
@@ -334,7 +332,7 @@ export async function setRewards({
         rateSetterSmartWalletWrapper = await goki.loadSmartWallet(
           rateSetterAuthority
         );
-        console.log("Using rate setter GOKI smart wallet");
+        console.log('Using rate setter GOKI smart wallet');
       } catch {
         /**/
       }
@@ -388,9 +386,7 @@ export async function setRewards({
       if (rentPayer) {
         newTransactionTx.addSigners(rentPayer);
       }
-      console.log(
-        `Creating GOKI tx #${index}) ${transactionKey.toBase58()}`
-      );
+      console.log(`Creating GOKI tx #${index}) ${transactionKey.toBase58()}`);
       if (simulate) {
         const result = await newTransactionTx.simulate();
         console.log(JSON.stringify(result.value));
@@ -402,7 +398,9 @@ export async function setRewards({
     }
     tx = tx.combine(setRatesTx);
   } else if (!rateSetterAuthority.equals(quarry.provider.walletKey)) {
-    throw new Error(`Rate setter ${rateSetterAuthority.toBase58()} signature is required`);
+    throw new Error(
+      `Rate setter ${rateSetterAuthority.toBase58()} signature is required`
+    );
   }
 
   if (tx.instructions.length == 0) {

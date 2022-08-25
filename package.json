@@ -6,38 +6,41 @@
   "scripts": {
     "cli": "ts-node ./src/index.ts",
     "_test": "jest --detectOpenHandles --runInBand",
-    "test": "ts-node ./src/testHelpers/runner.ts"
+    "test": "ts-node ./src/testHelpers/runner.ts",
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "pretest": "npm run compile",
+    "posttest": "npm run lint"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@gokiprotocol/client": "^0.11.1",
+    "@marinade.finance/solana-cli-utils": "^0.0.10",
     "@project-serum/anchor": "0.24",
     "@quarryprotocol/quarry-sdk": "^5.1.0",
     "@saberhq/anchor-contrib": "^1.13.32",
-    "@saberhq/solana-contrib": "^1.13.32",
+    "@saberhq/solana-contrib": "^1.14.4",
     "@saberhq/token-utils": "^1.13.32",
-    "@solana/web3.js": "^1.50.1",
+    "@solana/web3.js": "^1.54.0",
     "bn.js": "^5.2.1",
     "commander": "^9.4.0",
     "expand-tilde": "^2.0.2",
     "jsbi": "^4.3.0",
     "mz": "^2.7.0"
   },
-  "pnpm": {
-    "peerDependencyRules": {
-      "ignoreMissing": [
-        "react-native"
-      ]
-    }
-  },
   "devDependencies": {
+    "@marinade.finance/solana-test-utils": "^0.0.10",
     "@types/bn.js": "^5.1.0",
     "@types/expand-tilde": "^2.0.0",
     "@types/jest": "^28.1.6",
     "@types/mz": "^2.7.4",
     "@types/node": "^18.6.1",
+    "@types/node-fetch": "^2.6.2",
     "@types/once": "^1.4.0",
     "child-process": "^1.0.2",
     "gts": "^3.1.0",
@@ -48,5 +51,35 @@
     "ts-jest": "^28.0.7",
     "ts-node": "^10.9.1",
     "typescript": "^4.7.4"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "react-native"
+      ],
+      "allowedVersions": {
+        "jest": "28"
+      }
+    },
+    "packageExtensions": {
+      "@gokiprotocol/client": {
+        "dependencies": {
+          "@solana/buffer-layout": "^3.0.0"
+        }
+      },
+      "@saberhq/token-utils": {
+        "patchedDependencies": {
+          "@solana/spl-token@0.1.8": "patches/@solana__spl-token@0.1.8.patch"
+        }
+      },
+      "@solana/spl-token@0.1.8": {
+        "dependencies": {
+          "@solana/buffer-layout": "^3.0.0"
+        }
+      }
+    },
+    "patchedDependencies": {
+      "@solana/spl-token@0.1.8": "patches/@solana__spl-token@0.1.8.patch"
+    }
   }
 }

@@ -51,7 +51,9 @@ export class GokiHelper extends MultisigHelper {
     const { tx, transactionKey } =
       await this.smartWalletWrapper.newTransactionFromEnvelope({
         tx: inner,
-        proposer: this.includeWallet? this.goki.provider.walletKey: this.members[0].publicKey,
+        proposer: this.includeWallet
+          ? this.goki.provider.walletKey
+          : this.members[0].publicKey,
         payer: this.goki.provider.walletKey,
       });
     if (!this.includeWallet) {

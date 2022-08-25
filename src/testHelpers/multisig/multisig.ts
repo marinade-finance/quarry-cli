@@ -1,12 +1,13 @@
-import { TransactionEnvelope } from "@saberhq/solana-contrib";
-import { Keypair, PublicKey } from "@solana/web3.js";
-import BN from "bn.js";
+import { TransactionEnvelope } from '@saberhq/solana-contrib';
+import { Keypair, PublicKey } from '@solana/web3.js';
+import BN from 'bn.js';
 
 export abstract class MultisigHelper {
   protected constructor(
     public readonly members: Keypair[],
     public readonly includeWallet: boolean,
-    public readonly threshold: BN) {}
+    public readonly threshold: BN
+  ) {}
 
   abstract createTransaction(tx: TransactionEnvelope): Promise<PublicKey>;
   abstract executeTransaction(address: PublicKey): Promise<void>;

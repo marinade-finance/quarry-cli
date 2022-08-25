@@ -1,0 +1,12 @@
+diff --git a/lib/index.d.ts b/lib/index.d.ts
+index 73b120c1a5df92bd1dbac622b57b5f0897c808d4..74f7dbe45bd34e7c1e09d50201eae67c17133990 100644
+--- a/lib/index.d.ts
++++ b/lib/index.d.ts
+@@ -1,6 +1,6 @@
+ declare module '@solana/spl-token' {
+   import {Buffer} from 'buffer';
+-  import {Layout} from 'buffer-layout';
++  import {Layout} from '@solana/buffer-layout';
+   import {
+     PublicKey,
+     Signer,

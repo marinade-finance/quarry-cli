@@ -1,32 +1,32 @@
-import { GokiSDK, SmartWalletWrapper } from "@gokiprotocol/client";
+import { GokiSDK, SmartWalletWrapper } from '@gokiprotocol/client';
 import {
   findQuarryAddress,
   findRegistryAddress,
   Operator,
   QuarrySDK,
-} from "@quarryprotocol/quarry-sdk";
-import { TransactionEnvelope } from "@saberhq/solana-contrib";
-import { Token } from "@saberhq/token-utils";
-import { Keypair, PublicKey, SystemProgram } from "@solana/web3.js";
-import { Command } from "commander";
-import { useContext } from "./context";
-import { parseKeypair, parsePubkey } from "./keyParser";
+} from '@quarryprotocol/quarry-sdk';
+import { TransactionEnvelope } from '@saberhq/solana-contrib';
+import { Token } from '@saberhq/token-utils';
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
+import { Command } from 'commander';
+import { useContext } from './context';
+import { parseKeypair, parsePubkey } from '@marinade.finance/solana-cli-utils';
 
 export function installCreateQuarry(program: Command) {
   program
-    .command("create-quarry")
+    .command('create-quarry')
     .option(
-      "--rewarder <address>",
-      "Rewarder",
+      '--rewarder <address>',
+      'Rewarder',
       parsePubkey,
       Promise.resolve(
-        new PublicKey("J829VB5Fi7DMoMLK7bsVGFM82cRU61BKtiPz9PNFdL7b")
+        new PublicKey('J829VB5Fi7DMoMLK7bsVGFM82cRU61BKtiPz9PNFdL7b')
       )
     )
-    .option("--stake <pubkey>", "Stake token", parsePubkey)
-    .option("--admin <keypair>", "Authority", parseKeypair)
-    .option("--rent-payer <keypair>", "Rent payer", parseKeypair)
-    .option("--proposer <keypair>", "Proposer", parseKeypair)
+    .option('--stake <pubkey>', 'Stake token', parsePubkey)
+    .option('--admin <keypair>', 'Authority', parseKeypair)
+    .option('--rent-payer <keypair>', 'Rent payer', parseKeypair)
+    .option('--proposer <keypair>', 'Proposer', parseKeypair)
     .action(
       async ({
         rewarder,
@@ -134,7 +134,7 @@ export async function createQuarry({
   } else {
     try {
       smartWallet = await goki.loadSmartWallet(quarryCreator);
-      console.log("Using quarry creator GOKI smart wallet");
+      console.log('Using quarry creator GOKI smart wallet');
     } catch {
       /**/
     }
@@ -178,7 +178,7 @@ export async function createQuarry({
   }
 
   if (!(await quarry.provider.getAccountInfo(registry))) {
-    console.log("Creating rewarder registry");
+    console.log('Creating rewarder registry');
     const { tx: createRegistryTx } = await quarry.registry.newRegistry({
       numQuarries: 256,
       rewarderKey: rewarder,
