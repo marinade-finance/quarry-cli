@@ -14,6 +14,9 @@ import { parseKeypair } from '@marinade.finance/solana-cli-utils';
 import shellMatchers from 'jest-shell-matchers';
 import { file } from 'tmp-promise';
 import { MultisigHelper, MULTISIG_FACTORIES } from '../testHelpers/multisig';
+import { MintHelper } from '@marinade.finance/solana-test-utils';
+import { RewarderHelper } from '../testHelpers/rewarder';
+import { OperatorHelper } from '../testHelpers/operator';
 
 jest.setTimeout(300000);
 
@@ -25,67 +28,46 @@ beforeAll(() => {
 
 describe('create-quarry', () => {
   let provider: Provider;
-  let quarry: QuarrySDK;
-  let mintKeypair: Keypair;
-  let rewarderWrapper: RewarderWrapper;
+  let sdk: QuarrySDK;
+  let mint: MintHelper;
 
   beforeAll(async () => {
     provider = SolanaProvider.init({
       connection: new Connection('http://localhost:8899', 'confirmed'),
       wallet: new SignerWallet(await parseKeypair('~/.config/solana/id.json')),
     });
-    quarry = QuarrySDK.load({ provider });
+    sdk = QuarrySDK.load({ provider });
   });
 
   beforeEach(async () => {
-    expect(
-      quarry.provider.connection.getBalance(quarry.provider.walletKey)
-    ).resolves.toBeGreaterThan(0);
-    const { mintWrapper, tx: newWrapperAndMintTx } =
-      await quarry.mintWrapper.newWrapperAndMint({
-        mintKP: new Keypair(),
-        decimals: 9,
-        hardcap: new BN('18446744073709551615'),
-      });
-    await newWrapperAndMintTx.confirm();
-    const { tx: createRewarderTx, key: rewarderKey } =
-      await quarry.mine.createRewarder({
-        mintWrapper,
-      });
-    mintKeypair = new Keypair();
-    const tx = createRewarderTx.combine(
-      await createInitMintInstructions({
-        provider: quarry.provider,
-        mintKP: mintKeypair,
-        decimals: 9,
-      })
-    );
-    tx.addSigners(mintKeypair);
-    await tx.confirm();
-    rewarderWrapper = await quarry.mine.loadRewarderWrapper(rewarderKey);
+    // Prepare for quarry creation
+    mint = await MintHelper.create({ provider });
   });
 
   it('Runs with minimal parameters', async () => {
+    const rewarder = await RewarderHelper.create({
+      sdk,
+    });
     await expect([
       'pnpm',
       [
         'cli',
         'create-quarry',
         '--rewarder',
-        rewarderWrapper.rewarderKey.toBase58(),
+        rewarder.address.toBase58(),
         '--stake',
-        mintKeypair.publicKey.toBase58(),
+        mint.address.toBase58(),
       ],
     ]).toHaveMatchingSpawnOutput({
       code: 0,
       stderr: '',
     });
 
-    const quarryWrapper = await rewarderWrapper.getQuarry(
-      Token.fromMint(mintKeypair.publicKey, 9)
+    const quarryWrapper = await rewarder.wrapper.getQuarry(
+      Token.fromMint(mint.address, 9)
     );
     expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
-      mintKeypair.publicKey.toBase58()
+      mint.address.toBase58()
     );
   });
 
@@ -94,20 +76,10 @@ describe('create-quarry', () => {
     const { path: adminPath, cleanup } = await file();
     await fs.writeFile(adminPath, JSON.stringify(Array.from(admin.secretKey)));
 
-    const tx = rewarderWrapper.transferAuthority({
-      nextAuthority: admin.publicKey,
+    const rewarder = await RewarderHelper.create({
+      sdk,
+      admin,
     });
-    tx.append(
-      await quarry.programs.Mine.methods
-        .acceptAuthority()
-        .accounts({
-          authority: admin.publicKey,
-          rewarder: rewarderWrapper.rewarderKey,
-        })
-        .instruction()
-    );
-    tx.addSigners(admin);
-    await tx.confirm();
 
     await expect([
       'pnpm',
@@ -115,9 +87,9 @@ describe('create-quarry', () => {
         'cli',
         'create-quarry',
         '--rewarder',
-        rewarderWrapper.rewarderKey.toBase58(),
+        rewarder.address.toBase58(),
         '--stake',
-        mintKeypair.publicKey.toBase58(),
+        mint.address.toBase58(),
         '--admin',
         adminPath,
       ],
@@ -126,25 +98,22 @@ describe('create-quarry', () => {
       stderr: '',
     });
 
-    const quarryWrapper = await rewarderWrapper.getQuarry(
-      Token.fromMint(mintKeypair.publicKey, 9)
+    const quarryWrapper = await rewarder.wrapper.getQuarry(
+      Token.fromMint(mint.address, 9)
     );
     expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
-      mintKeypair.publicKey.toBase58()
+      mint.address.toBase58()
     );
     await cleanup();
   });
 
   it('Runs with operator', async () => {
-    const { key: operatorAddress, tx: createOperatorTx } =
-      await quarry.createOperator({
-        rewarder: rewarderWrapper.rewarderKey,
-      });
-    const transferTx = rewarderWrapper.transferAuthority({
-      nextAuthority: operatorAddress,
+    const rewarder = await RewarderHelper.create({
+      sdk,
+      admin: OperatorHelper.prepare({
+        sdk,
+      }),
     });
-    const tx = transferTx.combine(createOperatorTx);
-    await tx.confirm();
 
     await expect([
       'pnpm',
@@ -152,20 +121,20 @@ describe('create-quarry', () => {
         'cli',
         'create-quarry',
         '--rewarder',
-        rewarderWrapper.rewarderKey.toBase58(),
+        rewarder.address.toBase58(),
         '--stake',
-        mintKeypair.publicKey.toBase58(),
+        mint.address.toBase58(),
       ],
     ]).toHaveMatchingSpawnOutput({
       code: 0,
       stderr: '',
     });
 
-    const quarryWrapper = await rewarderWrapper.getQuarry(
-      Token.fromMint(mintKeypair.publicKey, 9)
+    const quarryWrapper = await rewarder.wrapper.getQuarry(
+      Token.fromMint(mint.address, 9)
     );
     expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
-      mintKeypair.publicKey.toBase58()
+      mint.address.toBase58()
     );
   });
 
@@ -174,25 +143,13 @@ describe('create-quarry', () => {
     const { path: adminPath, cleanup } = await file();
     await fs.writeFile(adminPath, JSON.stringify(Array.from(admin.secretKey)));
 
-    const { key: operatorAddress, tx: createOperatorTx } =
-      await quarry.createOperator({
-        rewarder: rewarderWrapper.rewarderKey,
-      });
-    const transferTx = rewarderWrapper.transferAuthority({
-      nextAuthority: operatorAddress,
+    const rewarder = await RewarderHelper.create({
+      sdk,
+      admin: OperatorHelper.prepare({
+        sdk,
+        quarryCreator: admin,
+      }),
     });
-    const tx = transferTx.combine(createOperatorTx);
-    tx.append(
-      await quarry.programs.Operator.methods
-        .setQuarryCreator()
-        .accounts({
-          operator: operatorAddress,
-          admin: quarry.provider.walletKey,
-          delegate: admin.publicKey,
-        })
-        .instruction()
-    );
-    await tx.confirm();
 
     await expect([
       'pnpm',
@@ -200,9 +157,9 @@ describe('create-quarry', () => {
         'cli',
         'create-quarry',
         '--rewarder',
-        rewarderWrapper.rewarderKey.toBase58(),
+        rewarder.address.toBase58(),
         '--stake',
-        mintKeypair.publicKey.toBase58(),
+        mint.address.toBase58(),
         '--admin',
         adminPath,
       ],
@@ -211,36 +168,14 @@ describe('create-quarry', () => {
       stderr: '',
     });
 
-    const quarryWrapper = await rewarderWrapper.getQuarry(
-      Token.fromMint(mintKeypair.publicKey, 9)
+    const quarryWrapper = await rewarder.wrapper.getQuarry(
+      Token.fromMint(mint.address, 9)
     );
     expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
-      mintKeypair.publicKey.toBase58()
+      mint.address.toBase58()
     );
     await cleanup();
   });
-
-  const transferAuthority: (
-    multisig: MultisigHelper
-  ) => Promise<void> = async multisig => {
-    const tx = rewarderWrapper.transferAuthority({
-      nextAuthority: multisig.authority,
-    });
-    await tx.confirm();
-
-    const txAddress = await multisig.createTransaction(
-      new TransactionEnvelope(provider, [
-        await quarry.programs.Mine.methods
-          .acceptAuthority()
-          .accounts({
-            authority: multisig.authority,
-            rewarder: rewarderWrapper.rewarderKey,
-          })
-          .instruction(),
-      ])
-    );
-    await multisig.executeTransaction(txAddress);
-  };
 
   for (const multisigFactory of MULTISIG_FACTORIES) {
     describe(`Multisig ${multisigFactory.name}`, () => {
@@ -248,7 +183,10 @@ describe('create-quarry', () => {
         const multisig = await multisigFactory.create({
           provider,
         });
-        await transferAuthority(multisig);
+        const rewarder = await RewarderHelper.create({
+          sdk,
+          admin: multisig,
+        });
 
         await expect([
           'pnpm',
@@ -256,9 +194,9 @@ describe('create-quarry', () => {
             'cli',
             'create-quarry',
             '--rewarder',
-            rewarderWrapper.rewarderKey.toBase58(),
+            rewarder.address.toBase58(),
             '--stake',
-            mintKeypair.publicKey.toBase58(),
+            mint.address.toBase58(),
           ],
         ]).toHaveMatchingSpawnOutput({
           code: 0,
@@ -272,11 +210,11 @@ describe('create-quarry', () => {
           await multisig.transactionByIndex(new BN(1))
         );
 
-        const quarryWrapper = await rewarderWrapper.getQuarry(
-          Token.fromMint(mintKeypair.publicKey, 9)
+        const quarryWrapper = await rewarder.wrapper.getQuarry(
+          Token.fromMint(mint.address, 9)
         );
         expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
-          mintKeypair.publicKey.toBase58()
+          mint.address.toBase58()
         );
       });
 
@@ -293,7 +231,10 @@ describe('create-quarry', () => {
           members: [proposer],
           includeWallet: false,
         });
-        await transferAuthority(multisig);
+        const rewarder = await RewarderHelper.create({
+          sdk,
+          admin: multisig,
+        });
 
         await expect([
           'pnpm',
@@ -301,9 +242,9 @@ describe('create-quarry', () => {
             'cli',
             'create-quarry',
             '--rewarder',
-            rewarderWrapper.rewarderKey.toBase58(),
+            rewarder.address.toBase58(),
             '--stake',
-            mintKeypair.publicKey.toBase58(),
+            mint.address.toBase58(),
             '--proposer',
             proposerPath,
           ],
@@ -319,12 +260,14 @@ describe('create-quarry', () => {
           await multisig.transactionByIndex(new BN(1))
         );
 
-        const quarryWrapper = await rewarderWrapper.getQuarry(
-          Token.fromMint(mintKeypair.publicKey, 9)
+        const quarryWrapper = await rewarder.wrapper.getQuarry(
+          Token.fromMint(mint.address, 9)
         );
         expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
-          mintKeypair.publicKey.toBase58()
+          mint.address.toBase58()
         );
+
+        await cleanup();
       });
 
       it(`Uses ${multisigFactory.name} with operator`, async () => {
@@ -332,25 +275,13 @@ describe('create-quarry', () => {
           provider,
         });
 
-        const { key: operatorAddress, tx: createOperatorTx } =
-          await quarry.createOperator({
-            rewarder: rewarderWrapper.rewarderKey,
-          });
-        const transferTx = rewarderWrapper.transferAuthority({
-          nextAuthority: operatorAddress,
+        const rewarder = await RewarderHelper.create({
+          sdk,
+          admin: OperatorHelper.prepare({
+            sdk,
+            quarryCreator: multisig,
+          }),
         });
-        const tx = transferTx.combine(createOperatorTx);
-        tx.append(
-          await quarry.programs.Operator.methods
-            .setQuarryCreator()
-            .accounts({
-              operator: operatorAddress,
-              admin: quarry.provider.walletKey,
-              delegate: multisig.authority,
-            })
-            .instruction()
-        );
-        await tx.confirm();
 
         await expect([
           'pnpm',
@@ -358,9 +289,9 @@ describe('create-quarry', () => {
             'cli',
             'create-quarry',
             '--rewarder',
-            rewarderWrapper.rewarderKey.toBase58(),
+            rewarder.address.toBase58(),
             '--stake',
-            mintKeypair.publicKey.toBase58(),
+            mint.address.toBase58(),
           ],
         ]).toHaveMatchingSpawnOutput({
           code: 0,
@@ -373,11 +304,11 @@ describe('create-quarry', () => {
         await multisig.executeTransaction(
           await multisig.transactionByIndex(new BN(0))
         );
-        const quarryWrapper = await rewarderWrapper.getQuarry(
-          Token.fromMint(mintKeypair.publicKey, 9)
+        const quarryWrapper = await rewarder.wrapper.getQuarry(
+          Token.fromMint(mint.address, 9)
         );
         expect(quarryWrapper.quarryData.tokenMintKey.toBase58()).toBe(
-          mintKeypair.publicKey.toBase58()
+          mint.address.toBase58()
         );
       });
     });

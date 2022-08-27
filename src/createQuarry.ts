@@ -1,4 +1,4 @@
-import { GokiSDK, SmartWalletWrapper } from '@gokiprotocol/client';
+import { GokiSDK } from '@gokiprotocol/client';
 import {
   findQuarryAddress,
   findRegistryAddress,
@@ -10,7 +10,11 @@ import { Token } from '@saberhq/token-utils';
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js';
 import { Command } from 'commander';
 import { useContext } from './context';
-import { parseKeypair, parsePubkey } from '@marinade.finance/solana-cli-utils';
+import {
+  parseKeypair,
+  parsePubkey,
+  middleware as m,
+} from '@marinade.finance/solana-cli-utils';
 
 export function installCreateQuarry(program: Command) {
   program
@@ -27,6 +31,7 @@ export function installCreateQuarry(program: Command) {
     .option('--admin <keypair>', 'Authority', parseKeypair)
     .option('--rent-payer <keypair>', 'Rent payer', parseKeypair)
     .option('--proposer <keypair>', 'Proposer', parseKeypair)
+    .option('--log-only', 'Do not create multisig transaction')
     .action(
       async ({
         rewarder,
@@ -34,12 +39,14 @@ export function installCreateQuarry(program: Command) {
         admin,
         rentPayer,
         proposer,
+        logOnly,
       }: {
         rewarder: Promise<PublicKey>;
         stake: Promise<PublicKey>;
         admin?: Promise<Keypair>;
         rentPayer?: Promise<Keypair>;
         proposer?: Promise<Keypair>;
+        logOnly?: boolean;
       }) => {
         const context = useContext();
         await createQuarry({
@@ -50,6 +57,7 @@ export function installCreateQuarry(program: Command) {
           admin: await admin,
           rentPayer: await rentPayer,
           proposer: await proposer,
+          logOnly,
           simulate: context.simulate,
         });
       }
@@ -64,6 +72,7 @@ export async function createQuarry({
   admin,
   rentPayer,
   proposer,
+  logOnly,
   simulate,
 }: {
   quarry: QuarrySDK;
@@ -73,6 +82,7 @@ export async function createQuarry({
   admin?: Keypair;
   rentPayer?: Keypair;
   proposer?: Keypair;
+  logOnly?: boolean;
   simulate?: boolean;
 }) {
   const rewarderWrapper = await quarry.mine.loadRewarderWrapper(rewarder);
@@ -98,6 +108,16 @@ export async function createQuarry({
       `Wrong admin ${admin.publicKey.toBase58()} expected ${quarryCreator.toBase58()}`
     );
   }
+
+  const middleware: m.Middleware[] = [];
+  await m.installMultisigMiddleware({
+    middleware,
+    goki,
+    address: quarryCreator,
+    proposer,
+    rentPayer,
+    logOnly,
+  });
 
   let tx = new TransactionEnvelope(quarry.provider, []);
   if (operator) {
@@ -128,18 +148,6 @@ export async function createQuarry({
     tx = createQuarryTx;
   }
 
-  let smartWallet: SmartWalletWrapper | undefined;
-  if (admin) {
-    tx.addSigners(admin);
-  } else {
-    try {
-      smartWallet = await goki.loadSmartWallet(quarryCreator);
-      console.log('Using quarry creator GOKI smart wallet');
-    } catch {
-      /**/
-    }
-  }
-
   const [registry] = await findRegistryAddress(rewarder);
 
   tx = tx.combine(
@@ -152,29 +160,12 @@ export async function createQuarry({
   if (rentPayer) {
     tx.addSigners(rentPayer);
   }
+  if (admin) {
+    tx.addSigners(admin);
+  }
 
-  if (smartWallet) {
-    const {
-      tx: newTransactionTx,
-      transactionKey,
-      index,
-    } = await smartWallet.newTransactionFromEnvelope({
-      tx,
-      proposer: proposer?.publicKey,
-      payer: rentPayer?.publicKey,
-    });
-    if (proposer) {
-      newTransactionTx.addSigners(proposer);
-    }
-    if (rentPayer) {
-      newTransactionTx.addSigners(rentPayer);
-    }
-    console.log(`Creating GOKI tx #${index}) ${transactionKey.toBase58()}`);
-    tx = newTransactionTx;
-  } else if (!admin) {
-    if (!quarryCreator.equals(quarry.provider.walletKey)) {
-      throw new Error(`Admin ${quarryCreator.toBase58()} signature required`);
-    }
+  for (const m of middleware) {
+    tx = await m.apply(tx);
   }
 
   if (!(await quarry.provider.getAccountInfo(registry))) {
@@ -185,10 +176,6 @@ export async function createQuarry({
       payer: rentPayer?.publicKey,
     });
     tx = createRegistryTx.combine(tx); // Prepend
-
-    if (rentPayer) {
-      tx.addSigners(rentPayer);
-    }
   }
 
   if (simulate) {

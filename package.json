@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "cli": "ts-node ./src/index.ts",
+    "cli": "node ./build/src/index.js",
     "_test": "jest --detectOpenHandles --runInBand",
-    "test": "ts-node ./src/testHelpers/runner.ts",
+    "test": "pnpm compile && ts-node ./src/testHelpers/runner.ts",
     "lint": "gts lint",
     "clean": "gts clean",
     "compile": "tsc",

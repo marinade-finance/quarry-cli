@@ -4,13 +4,26 @@ import {
   QuarrySDK,
   RewarderWrapper,
 } from '@quarryprotocol/quarry-sdk';
-import { TransactionEnvelope } from '@saberhq/solana-contrib';
-import { Keypair, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
+import {
+  TransactionEnvelope,
+  TransactionReceipt,
+} from '@saberhq/solana-contrib';
+import {
+  Keypair,
+  LAMPORTS_PER_SOL,
+  PublicKey,
+  RpcResponseAndContext,
+  SimulatedTransactionResponse,
+} from '@solana/web3.js';
 import assert from 'assert';
 import BN from 'bn.js';
 import { Command } from 'commander';
 import { useContext } from './context';
-import { parseKeypair, parsePubkey } from '@marinade.finance/solana-cli-utils';
+import {
+  parseKeypair,
+  parsePubkey,
+  middleware as m,
+} from '@marinade.finance/solana-cli-utils';
 
 export interface QuarryShare {
   mint: PublicKey;
@@ -125,6 +138,7 @@ export async function setRewards({
   rateSetter,
   rentPayer,
   proposer,
+  logOnly,
   simulate,
 }: {
   quarry: QuarrySDK;
@@ -138,13 +152,13 @@ export async function setRewards({
   rateSetter?: Keypair;
   rentPayer?: Keypair;
   proposer?: Keypair;
+  logOnly?: boolean;
   simulate?: boolean;
 }) {
   const rewarderWrapper = await quarry.mine.loadRewarderWrapper(rewarder);
   const quarries = await quarry.mine.program.account.quarry.all(
     rewarderWrapper.rewarderKey.toBuffer()
   );
-  const mints = quarries.map(quarry => quarry.account.tokenMintKey);
   const shareMap = new Map<string, BN>();
   for (const quarryWrapper of quarries) {
     shareMap.set(
@@ -194,47 +208,42 @@ export async function setRewards({
       rewarderWrapper.rewarderData.authority;
   }
 
-  if (rateSetter && !rateSetterAuthority.equals(rateSetter.publicKey)) {
-    throw new Error(
-      `Invalid rate setter ${
-        rateSetter.publicKey
-      }. Expected ${rateSetterAuthority.toBase58()}`
-    );
-  }
-
-  if (
-    shareAllocator &&
-    !shareAllocatorAuthority.equals(shareAllocator.publicKey)
-  ) {
-    throw new Error(
-      `Invalid share allocator ${
-        shareAllocator.publicKey
-      }. Expected ${shareAllocatorAuthority.toBase58()}`
-    );
-  }
-
-  let tx = new TransactionEnvelope(quarry.provider, []);
+  let hasChanges = false;
+  let hasMultisigs = false;
 
   if (shares) {
-    let shareAllocatorSmartWallet: SmartWalletWrapper | undefined;
-    if (!shareAllocator) {
-      try {
-        shareAllocatorSmartWallet = await goki.loadSmartWallet(
-          shareAllocatorAuthority
-        );
-        console.log('Using share allocator GOKI smart wallet');
-      } catch {
-        /**/
-      }
+    if (
+      shareAllocator &&
+      !shareAllocatorAuthority.equals(shareAllocator.publicKey)
+    ) {
+      throw new Error(
+        `Invalid share allocator ${
+          shareAllocator.publicKey
+        }. Expected ${shareAllocatorAuthority.toBase58()}`
+      );
     }
 
-    const setSharesTx = new TransactionEnvelope(quarry.provider, []);
+    const middleware: m.Middleware[] = [];
+    await m.installMultisigMiddleware({
+      middleware,
+      goki,
+      address: shareAllocatorAuthority,
+      proposer,
+      rentPayer,
+      logOnly,
+    });
+    if (middleware.length > 0) {
+      hasMultisigs = true;
+    }
+
+    let setSharesTx = new TransactionEnvelope(quarry.provider, []);
 
     for (const quarryWrapper of quarries) {
       const share = shareMap.get(
         quarryWrapper.account.tokenMintKey.toBase58()
       )!;
       if (!share.eq(quarryWrapper.account.rewardsShare)) {
+        hasChanges = true;
         console.log(
           `Quarry for ${quarryWrapper.account.tokenMintKey.toBase58()} change rate ${
             quarryWrapper.account.rewardsShare
@@ -272,70 +281,49 @@ export async function setRewards({
       }
     }
 
+    for (const m of middleware) {
+      setSharesTx = await m.apply(setSharesTx);
+    }
+
     if (shareAllocator) {
       setSharesTx.addSigners(shareAllocator);
-    } else if (shareAllocatorSmartWallet) {
-      while (setSharesTx.instructions.length > 0) {
-        const testTx = new TransactionEnvelope(tx.provider, [
-          ...setSharesTx.instructions,
-        ]);
-        do {
-          const {
-            tx: newTransactionTx,
-            transactionKey,
-            index,
-          } = await shareAllocatorSmartWallet.newTransactionFromEnvelope({
-            tx: testTx,
-            proposer: proposer?.publicKey,
-            payer: rentPayer?.publicKey,
-          });
-          if (proposer) {
-            newTransactionTx.addSigners(proposer);
-          }
-          if (rentPayer) {
-            newTransactionTx.addSigners(rentPayer);
-          }
-          const estimation = newTransactionTx.estimateSize();
-          if ('size' in estimation) {
-            console.log(
-              `Creating GOKI tx #${index}) ${transactionKey.toBase58()}`
-            );
-            if (simulate) {
-              const result = await newTransactionTx.simulate();
-              console.log(JSON.stringify(result.value));
-            } else {
-              const result = await newTransactionTx.confirm();
-              console.log(`Tx: ${result.signature}`);
-            }
-            break;
-          }
-          testTx.instructions.pop();
-          assert(testTx.instructions.length > 0);
-        } while (true);
-
-        for (const _ of testTx.instructions) {
-          setSharesTx.instructions.shift();
-        }
-      }
-    } else if (!shareAllocatorAuthority.equals(quarry.provider.walletKey)) {
-      throw new Error(
-        `Share allocator ${shareAllocatorAuthority.toBase58()} signature is required`
-      );
     }
-    tx = tx.combine(setSharesTx); // must be empty if goki was used
+
+    for (const tx of setSharesTx.partition()) {
+      if (simulate) {
+        const result = await tx.simulate();
+        console.log(JSON.stringify(result.value));
+      } else {
+        const result = await tx.confirm();
+        console.log(`Tx: ${result.signature}`);
+      }
+    }
   }
 
-  if (totalRewards) {
-    let rateSetterSmartWalletWrapper: SmartWalletWrapper | undefined;
-    if (!rateSetter && totalRewards !== undefined) {
-      try {
-        rateSetterSmartWalletWrapper = await goki.loadSmartWallet(
-          rateSetterAuthority
-        );
-        console.log('Using rate setter GOKI smart wallet');
-      } catch {
-        /**/
-      }
+  if (
+    totalRewards &&
+    !totalRewards.eq(rewarderWrapper.rewarderData.annualRewardsRate)
+  ) {
+    hasChanges = true;
+    if (rateSetter && !rateSetterAuthority.equals(rateSetter.publicKey)) {
+      throw new Error(
+        `Invalid rate setter ${
+          rateSetter.publicKey
+        }. Expected ${rateSetterAuthority.toBase58()}`
+      );
+    }
+
+    const middleware: m.Middleware[] = [];
+    await m.installMultisigMiddleware({
+      middleware,
+      goki,
+      address: rateSetterAuthority,
+      proposer,
+      rentPayer,
+      logOnly,
+    });
+    if (middleware.length > 0) {
+      hasMultisigs = true;
     }
 
     let setRatesTx = new TransactionEnvelope(quarry.provider, []);
@@ -369,49 +357,44 @@ export async function setRewards({
     }
 
     if (rateSetter) {
-      tx.addSigners(rateSetter);
-    } else if (rateSetterSmartWalletWrapper) {
-      const {
-        tx: newTransactionTx,
-        transactionKey,
-        index,
-      } = await rateSetterSmartWalletWrapper.newTransactionFromEnvelope({
-        tx: setRatesTx,
-        proposer: proposer?.publicKey,
-        payer: rentPayer?.publicKey,
-      });
-      if (proposer) {
-        newTransactionTx.addSigners(proposer);
-      }
-      if (rentPayer) {
-        newTransactionTx.addSigners(rentPayer);
-      }
-      console.log(`Creating GOKI tx #${index}) ${transactionKey.toBase58()}`);
-      if (simulate) {
-        const result = await newTransactionTx.simulate();
-        console.log(JSON.stringify(result.value));
-      } else {
-        const result = await newTransactionTx.confirm();
-        console.log(`Tx: ${result.signature}`);
-      }
-      setRatesTx = new TransactionEnvelope(quarry.provider, []);
+      setRatesTx.addSigners(rateSetter);
     }
-    tx = tx.combine(setRatesTx);
-  } else if (!rateSetterAuthority.equals(quarry.provider.walletKey)) {
-    throw new Error(
-      `Rate setter ${rateSetterAuthority.toBase58()} signature is required`
+
+    for (const m of middleware) {
+      setRatesTx = await m.apply(setRatesTx);
+    }
+    if (simulate) {
+      const result = await setRatesTx.simulate();
+      console.log(JSON.stringify(result.value));
+    } else {
+      const result = await setRatesTx.confirm();
+      console.log(`Tx: ${result.signature}`);
+    }
+  }
+
+  if (hasChanges && !hasMultisigs) {
+    const tx = await rewarderWrapper.syncQuarryRewards(
+      quarries.map(quarry => quarry.account.tokenMintKey)
     );
-  }
-
-  if (tx.instructions.length == 0) {
-    return;
-  }
-
-  if (simulate) {
-    const result = await tx.simulate();
-    console.log(JSON.stringify(result.value));
-  } else {
-    const result = await tx.confirm();
-    console.log(`Tx: ${result.signature}`);
+    const results = await Promise.all(
+      tx.partition().map(async tx => {
+        if (simulate) {
+          return tx.simulate();
+        } else {
+          return tx.confirm();
+        }
+      })
+    );
+    if (simulate) {
+      for (const r of results) {
+        console.log(
+          (r as RpcResponseAndContext<SimulatedTransactionResponse>).value
+        );
+      }
+    } else {
+      for (const r of results) {
+        console.log(`Tx: ${(r as TransactionReceipt).signature}`);
+      }
+    }
   }
 }
