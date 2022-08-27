@@ -228,7 +228,8 @@ describe('create-quarry', () => {
 
         const multisig = await multisigFactory.create({
           provider,
-          members: [proposer],
+          members: [proposer, new Keypair(), new Keypair()],
+          threshold: new BN(2),
           includeWallet: false,
         });
         const rewarder = await RewarderHelper.create({

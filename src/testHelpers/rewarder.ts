@@ -8,6 +8,7 @@ import {
 import { TransactionEnvelope } from '@saberhq/solana-contrib';
 import { Token, u64 } from '@saberhq/token-utils';
 import { Keypair, PublicKey } from '@solana/web3.js';
+import assert from 'assert';
 import BN from 'bn.js';
 import { MultisigHelper } from './multisig';
 import {
@@ -169,6 +170,9 @@ export class RewarderHelper {
       await admin.executeTransaction(txAddress);
     }
     rewarderWrapper = await sdk.mine.loadRewarderWrapper(rewarderKey);
+    assert(rewarderWrapper.rewarderData.authority.equals(adminAuthority));
+    assert(rewarderWrapper.rewarderData.annualRewardsRate.eqn(rate));
+
     return new RewarderHelper(
       rewarderWrapper,
       pendingOperatorHelper
@@ -184,6 +188,15 @@ export class RewarderHelper {
         )
       )
     );
+  }
+
+  async syncQuarries() {
+    if (this.quarries.length > 0) {
+      const tx = await this.wrapper.syncQuarryRewards(
+        this.quarries.map(quarry => quarry.mint.address)
+      );
+      await Promise.all(tx.partition().map(tx => tx.confirm()));
+    }
   }
 
   async reload() {

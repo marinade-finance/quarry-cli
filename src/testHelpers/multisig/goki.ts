@@ -66,18 +66,21 @@ export class GokiHelper extends MultisigHelper {
 
   async executeTransaction(address: PublicKey): Promise<void> {
     const info = await this.smartWalletWrapper.fetchTransaction(address);
-    const signersLeft =
+    let signersLeft =
       this.smartWalletWrapper.data!.threshold.toNumber() -
       info.signers.filter(s => s).length;
     let tx = new TransactionEnvelope(this.goki.provider, []);
-    for (let i = 0; i < signersLeft; i++) {
-      tx = tx.combine(
-        this.smartWalletWrapper.approveTransaction(
-          address,
-          this.members[i].publicKey
-        )
-      );
-      tx.addSigners(this.members[i]);
+    for (let i = 0; i < info.signers.length && signersLeft > 0; i++) {
+      if (!info.signers[i]) {
+        tx = tx.combine(
+          this.smartWalletWrapper.approveTransaction(
+            address,
+            this.members[i].publicKey
+          )
+        );
+        tx.addSigners(this.members[i]);
+        signersLeft--;
+      }
     }
     tx = tx.combine(
       await this.smartWalletWrapper.executeTransaction({
