@@ -10,13 +10,13 @@ patchedDependencies:
 specifiers:
   '@gokiprotocol/client': ^0.11.1
   '@marinade.finance/solana-cli-utils': ^0.0.13
-  '@marinade.finance/solana-test-utils': ^0.0.13
-  '@project-serum/anchor': '0.24'
+  '@marinade.finance/solana-test-utils': ^0.0.14
+  '@project-serum/anchor': ~0.24.2
   '@quarryprotocol/quarry-sdk': ^5.2.0
   '@saberhq/anchor-contrib': ^1.14.4
   '@saberhq/solana-contrib': ^1.14.4
   '@saberhq/token-utils': ^1.14.4
-  '@solana/web3.js': ^1.54.0
+  '@solana/web3.js': ^1.54.1
   '@types/bn.js': ^5.1.0
   '@types/jest': ^28.1.8
   '@types/mz': ^2.7.4
@@ -35,20 +35,20 @@ specifiers:
   typescript: 4.7.4
 
 dependencies:
-  '@gokiprotocol/client': 0.11.1_pznyfxlrn7ixfadwut6wi3frfa
-  '@marinade.finance/solana-cli-utils': 0.0.13_yink264rhe5fbpiclnpegkyqqe
+  '@gokiprotocol/client': 0.11.1_2jh25lxi3cukoji2ywxdwkqox4
+  '@marinade.finance/solana-cli-utils': 0.0.13_d4ntm6qj3kb4snxy57kterorwq
   '@project-serum/anchor': 0.24.2
-  '@quarryprotocol/quarry-sdk': 5.2.0_adeq4eaevc4thv52ghdpkrbq4u
-  '@saberhq/anchor-contrib': 1.14.4_rxqdisp2tsq7dpx5jtjzvn3coy
-  '@saberhq/solana-contrib': 1.14.4_347cdsh5sve5yq6ei46ddt7esi
-  '@saberhq/token-utils': 1.14.4_lujszxiaedoaerm3la6zptxvdi
-  '@solana/web3.js': 1.54.0
+  '@quarryprotocol/quarry-sdk': 5.2.0_lraptur5jcxmc5yrct46yqzram
+  '@saberhq/anchor-contrib': 1.14.4_4eiiqqp3y2nrmao6ji34i7ppcm
+  '@saberhq/solana-contrib': 1.14.4_7pcwljqf3o3a3kox534zrcd5mm
+  '@saberhq/token-utils': 1.14.4_52x6pppak6f2tfdper7sxks2re
+  '@solana/web3.js': 1.54.1
   bn.js: 5.2.1
   commander: 9.4.0
   jsbi: 4.3.0
 
 devDependencies:
-  '@marinade.finance/solana-test-utils': 0.0.13_ft5wrrd6bgx2mtvgs2qwrf6q5q
+  '@marinade.finance/solana-test-utils': 0.0.14_zoftgdomdsrzftgpc7mzswzndq
   '@types/bn.js': 5.1.0
   '@types/jest': 28.1.8
   '@types/mz': 2.7.4
@@ -430,22 +430,7 @@ packages:
       - supports-color
     dev: true
 
-  /@ethersproject/bytes/5.7.0:
-    resolution: {integrity: sha512-nsbxwgFXWh9NyYWo+U8atvmMsSdKJprTcICAkvbBffT75qDocbuggBU0SJiVK2MuTrp0q+xvLkTnGMPK1+uA9A==}
-    dependencies:
-      '@ethersproject/logger': 5.7.0
-
-  /@ethersproject/logger/5.7.0:
-    resolution: {integrity: sha512-0odtFdXu/XHtjQXJYA3u9G0G8btm0ND5Cu8M7i5vhEcE8/HmF4Lbdqanwyv4uQTr2tx6b7fQRmgLrsnpQlmnig==}
-
-  /@ethersproject/sha2/5.7.0:
-    resolution: {integrity: sha512-gKlH42riwb3KYp0reLsFTokByAKoJdgFCwI+CCiX/k+Jm2mbNs6oOaCjYQSlI1+XBVejwH2KrmCbMAT/GnRDQw==}
-    dependencies:
-      '@ethersproject/bytes': 5.7.0
-      '@ethersproject/logger': 5.7.0
-      hash.js: 1.1.7
-
-  /@gokiprotocol/client/0.11.1_pznyfxlrn7ixfadwut6wi3frfa:
+  /@gokiprotocol/client/0.11.1_2jh25lxi3cukoji2ywxdwkqox4:
     resolution: {integrity: sha512-ckMxHxD1GLtllWzQWHah61FxkuQhJo79MPEJsdCF8eiLA/orN/nAU8N5kzihl/Rm67RjnV452e3Sjoyn1MLmLA==}
     peerDependencies:
       '@project-serum/anchor': '>=0.24'
@@ -456,11 +441,11 @@ packages:
       bn.js: ^5
     dependencies:
       '@project-serum/anchor': 0.24.2
-      '@saberhq/anchor-contrib': 1.14.4_rxqdisp2tsq7dpx5jtjzvn3coy
-      '@saberhq/solana-contrib': 1.14.4_347cdsh5sve5yq6ei46ddt7esi
-      '@saberhq/token-utils': 1.14.4_lujszxiaedoaerm3la6zptxvdi
+      '@saberhq/anchor-contrib': 1.14.4_4eiiqqp3y2nrmao6ji34i7ppcm
+      '@saberhq/solana-contrib': 1.14.4_7pcwljqf3o3a3kox534zrcd5mm
+      '@saberhq/token-utils': 1.14.4_52x6pppak6f2tfdper7sxks2re
       '@solana/buffer-layout': 3.0.0
-      '@solana/web3.js': 1.54.0
+      '@solana/web3.js': 1.54.1
       bn.js: 5.2.1
       lodash.mapvalues: 4.6.0
       superstruct: 0.16.0
@@ -757,7 +742,7 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
-  /@marinade.finance/solana-cli-utils/0.0.13_yink264rhe5fbpiclnpegkyqqe:
+  /@marinade.finance/solana-cli-utils/0.0.13_d4ntm6qj3kb4snxy57kterorwq:
     resolution: {integrity: sha512-cx16cgp/CRYko/Rfq7z3UcK0Ar99LP+wXf+SIvPyA15+NyigKetpv8Bp708V138aDMNZNYGdaI/ZJZ7L8iiu4Q==}
     peerDependencies:
       '@gokiprotocol/client': ^0.11.1
@@ -769,13 +754,13 @@ packages:
       bn.js: ^5.2.1
       jsbi: ^4.3.0
     dependencies:
-      '@gokiprotocol/client': 0.11.1_pznyfxlrn7ixfadwut6wi3frfa
+      '@gokiprotocol/client': 0.11.1_2jh25lxi3cukoji2ywxdwkqox4
       '@project-serum/anchor': 0.24.2
-      '@saberhq/anchor-contrib': 1.14.4_rxqdisp2tsq7dpx5jtjzvn3coy
-      '@saberhq/solana-contrib': 1.14.4_347cdsh5sve5yq6ei46ddt7esi
-      '@saberhq/token-utils': 1.14.4_lujszxiaedoaerm3la6zptxvdi
+      '@saberhq/anchor-contrib': 1.14.4_4eiiqqp3y2nrmao6ji34i7ppcm
+      '@saberhq/solana-contrib': 1.14.4_7pcwljqf3o3a3kox534zrcd5mm
+      '@saberhq/token-utils': 1.14.4_52x6pppak6f2tfdper7sxks2re
       '@solana/spl-governance': 0.3.13
-      '@solana/web3.js': 1.54.0
+      '@solana/web3.js': 1.54.1
       bn.js: 5.2.1
       expand-tilde: 2.0.2
       jsbi: 4.3.0
@@ -785,38 +770,54 @@ packages:
       - encoding
       - utf-8-validate
 
-  /@marinade.finance/solana-test-utils/0.0.13_ft5wrrd6bgx2mtvgs2qwrf6q5q:
-    resolution: {integrity: sha512-8clq08LdwrSL2ViPScJntajGBXwaXMco0zIE/Z+bKH3/mYo+X9py6RGUOrkX9S/DPThjkGGvX9Jq8GirCLeO2A==}
+  /@marinade.finance/solana-test-utils/0.0.14_zoftgdomdsrzftgpc7mzswzndq:
+    resolution: {integrity: sha512-qQ8cowQcQE+uPq4x8Wlg0OOC0+XSopxK3JTTVHhpRLDLu9xw43tfCYPVVCvHsuAbNxjPETjmk7GJSYvT3lZZIw==}
     engines: {node: '>10'}
     peerDependencies:
+      '@gokiprotocol/client': ^0.11.1
+      '@project-serum/anchor': '0.24'
+      '@quarryprotocol/quarry-sdk': ^5.2.0
+      '@saberhq/anchor-contrib': ^1.14.4
       '@saberhq/solana-contrib': ^1.14.4
+      '@saberhq/token-utils': ^1.14.4
       '@solana/web3.js': ^1.54.0
       bn.js: ^5.2.1
+      jsbi: ^4.3.0
     dependencies:
-      '@marinade.finance/solana-cli-utils': 0.0.13_yink264rhe5fbpiclnpegkyqqe
-      '@saberhq/solana-contrib': 1.14.4_347cdsh5sve5yq6ei46ddt7esi
-      '@solana/spl-token': 0.3.4_@solana+web3.js@1.54.0
-      '@solana/web3.js': 1.54.0
+      '@gokiprotocol/client': 0.11.1_2jh25lxi3cukoji2ywxdwkqox4
+      '@marinade.finance/solana-cli-utils': 0.0.13_d4ntm6qj3kb4snxy57kterorwq
+      '@project-serum/anchor': 0.24.2
+      '@quarryprotocol/quarry-sdk': 5.2.0_lraptur5jcxmc5yrct46yqzram
+      '@saberhq/anchor-contrib': 1.14.4_4eiiqqp3y2nrmao6ji34i7ppcm
+      '@saberhq/solana-contrib': 1.14.4_7pcwljqf3o3a3kox534zrcd5mm
+      '@saberhq/token-utils': 1.14.4_52x6pppak6f2tfdper7sxks2re
+      '@solana/web3.js': 1.54.1
       bn.js: 5.2.1
       jest: 28.1.3_vqz5d3y22yhywvm6xfyh7j5jna
       jest-shell-matchers: 1.0.2_jest@28.1.3
+      jsbi: 4.3.0
       mz: 2.7.0
+      solana-spl-token-modern: /@solana/spl-token/0.3.4_@solana+web3.js@1.54.1
       tmp: 0.2.1
       tmp-promise: 3.0.3
     transitivePeerDependencies:
-      - '@gokiprotocol/client'
-      - '@project-serum/anchor'
-      - '@saberhq/anchor-contrib'
-      - '@saberhq/token-utils'
       - '@types/node'
       - bufferutil
       - encoding
-      - jsbi
       - node-notifier
       - supports-color
       - ts-node
       - utf-8-validate
     dev: true
+
+  /@noble/ed25519/1.7.0:
+    resolution: {integrity: sha512-LeAxFK0+181zQOhOUuKE8Jnd3duzYhDNd3iCLxpmzA5K+e4I1FdbrK3Ot0ZHBwZMeRD/6EojyUfTbpHZ+hkQHg==}
+
+  /@noble/hashes/1.1.2:
+    resolution: {integrity: sha512-KYRCASVTv6aeUi1tsF8/vpyR7zpfs3FUzy2Jqm+MU+LmUKhQ0y2FpfwqkCcxSg2ua4GALJd8k2R76WxwZGbQpA==}
+
+  /@noble/secp256k1/1.6.3:
+    resolution: {integrity: sha512-T04e4iTurVy7I8Sw4+c5OSN9/RkPlo1uKxAomtxQNLq8j1uPAqnsqG1bqvY3Jv7c13gyr6dui0zmh/I3+f/JaQ==}
 
   /@nodelib/fs.scandir/2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -843,8 +844,8 @@ packages:
     resolution: {integrity: sha512-0/718g8/DnEuwAidUwh5wLYphUYXhUbiClkuRNhvNoa+1Y8a4g2tJyxoae+emV+PG/Gikd/QUBNMkIcimiIRTA==}
     engines: {node: '>=11'}
     dependencies:
-      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.54.0
-      '@solana/web3.js': 1.54.0
+      '@project-serum/borsh': 0.2.5_@solana+web3.js@1.54.1
+      '@solana/web3.js': 1.54.1
       base64-js: 1.5.1
       bn.js: 5.2.1
       bs58: 4.0.1
@@ -862,17 +863,17 @@ packages:
       - encoding
       - utf-8-validate
 
-  /@project-serum/borsh/0.2.5_@solana+web3.js@1.54.0:
+  /@project-serum/borsh/0.2.5_@solana+web3.js@1.54.1:
     resolution: {integrity: sha512-UmeUkUoKdQ7rhx6Leve1SssMR/Ghv8qrEiyywyxSWg7ooV7StdpPBhciiy5eB3T0qU1BXvdRNC8TdrkxK7WC5Q==}
     engines: {node: '>=10'}
     peerDependencies:
       '@solana/web3.js': ^1.2.0
     dependencies:
-      '@solana/web3.js': 1.54.0
+      '@solana/web3.js': 1.54.1
       bn.js: 5.2.1
       buffer-layout: 1.2.2
 
-  /@quarryprotocol/quarry-sdk/5.2.0_adeq4eaevc4thv52ghdpkrbq4u:
+  /@quarryprotocol/quarry-sdk/5.2.0_lraptur5jcxmc5yrct46yqzram:
     resolution: {integrity: sha512-D7fk0itndGYS2emeazzJfnIqYqQDHi45GuPXWeiXHmM9RCJuBLP7efNRWpyS8IyF0rl4nBOqCImMwUNfD4U4Eg==}
     peerDependencies:
       '@project-serum/anchor': '>=0.24'
@@ -884,18 +885,17 @@ packages:
       jsbi: ^3 || ^4
     dependencies:
       '@project-serum/anchor': 0.24.2
-      '@saberhq/anchor-contrib': 1.14.4_rxqdisp2tsq7dpx5jtjzvn3coy
-      '@saberhq/solana-contrib': 1.14.4_347cdsh5sve5yq6ei46ddt7esi
-      '@saberhq/token-utils': 1.14.4_lujszxiaedoaerm3la6zptxvdi
-      '@solana/web3.js': 1.54.0
+      '@saberhq/anchor-contrib': 1.14.4_4eiiqqp3y2nrmao6ji34i7ppcm
+      '@saberhq/solana-contrib': 1.14.4_7pcwljqf3o3a3kox534zrcd5mm
+      '@saberhq/token-utils': 1.14.4_52x6pppak6f2tfdper7sxks2re
+      '@solana/web3.js': 1.54.1
       bn.js: 5.2.1
       jsbi: 4.3.0
       superstruct: 0.16.0
       tiny-invariant: 1.2.0
       tslib: 2.4.0
-    dev: false
 
-  /@saberhq/anchor-contrib/1.14.4_rxqdisp2tsq7dpx5jtjzvn3coy:
+  /@saberhq/anchor-contrib/1.14.4_4eiiqqp3y2nrmao6ji34i7ppcm:
     resolution: {integrity: sha512-dhagoDk0FMhCGzpEbz4nxTPdmRjJ4Nvj6bs4iVKAqaxAVmU62eFQGZuH1z0KzjxCYfpqTjdvay0ffAG0Z11ahA==}
     peerDependencies:
       '@project-serum/anchor': ^0.22 || ^0.23 || ^0.24
@@ -903,8 +903,8 @@ packages:
       bn.js: ^4 || ^5
     dependencies:
       '@project-serum/anchor': 0.24.2
-      '@saberhq/solana-contrib': 1.14.4_347cdsh5sve5yq6ei46ddt7esi
-      '@solana/web3.js': 1.54.0
+      '@saberhq/solana-contrib': 1.14.4_7pcwljqf3o3a3kox534zrcd5mm
+      '@solana/web3.js': 1.54.1
       bn.js: 5.2.1
       eventemitter3: 4.0.7
       lodash.camelcase: 4.3.0
@@ -916,7 +916,7 @@ packages:
     dependencies:
       tslib: 2.4.0
 
-  /@saberhq/solana-contrib/1.14.4_347cdsh5sve5yq6ei46ddt7esi:
+  /@saberhq/solana-contrib/1.14.4_7pcwljqf3o3a3kox534zrcd5mm:
     resolution: {integrity: sha512-mV7nGecTaVB4opsC5fZT3fRcQHBQ7OyUYGCCHge6Q65rOTfajvVusm+LA2joalWUuYpxZuNH3rQZCY8WRNSpTQ==}
     peerDependencies:
       '@solana/web3.js': ^1.42
@@ -924,7 +924,7 @@ packages:
     dependencies:
       '@saberhq/option-utils': 1.14.4
       '@solana/buffer-layout': 4.0.0
-      '@solana/web3.js': 1.54.0
+      '@solana/web3.js': 1.54.1
       '@types/promise-retry': 1.1.3
       '@types/retry': 0.12.2
       bn.js: 5.2.1
@@ -933,17 +933,17 @@ packages:
       tiny-invariant: 1.2.0
       tslib: 2.4.0
 
-  /@saberhq/token-utils/1.14.4_lujszxiaedoaerm3la6zptxvdi:
+  /@saberhq/token-utils/1.14.4_52x6pppak6f2tfdper7sxks2re:
     resolution: {integrity: sha512-+GJjiwVnAkdXucLLZae/aw4ruY1nRZ8lgEKctU0l1ikpYpRPdDRmk7WtbsJBeM5HDRdkx9qVlLwb6aDMshygTA==}
     peerDependencies:
       '@solana/web3.js': ^1.42
       bn.js: ^4 || ^5
       jsbi: ^3 || ^4
     dependencies:
-      '@saberhq/solana-contrib': 1.14.4_347cdsh5sve5yq6ei46ddt7esi
+      '@saberhq/solana-contrib': 1.14.4_7pcwljqf3o3a3kox534zrcd5mm
       '@solana/buffer-layout': 4.0.0
       '@solana/spl-token': 0.1.8_bvfty7k7s7a7kmlylrehshe3ra
-      '@solana/web3.js': 1.54.0
+      '@solana/web3.js': 1.54.1
       '@ubeswap/token-math': 5.2.0_jsbi@4.3.0
       bn.js: 5.2.1
       jsbi: 4.3.0
@@ -980,7 +980,7 @@ packages:
     engines: {node: '>= 10'}
     dependencies:
       '@solana/buffer-layout': 4.0.0
-      '@solana/web3.js': 1.54.0
+      '@solana/web3.js': 1.54.1
       bigint-buffer: 1.1.5
       bignumber.js: 9.1.0
     transitivePeerDependencies:
@@ -1004,7 +1004,7 @@ packages:
   /@solana/spl-governance/0.3.13:
     resolution: {integrity: sha512-qoLSXMqHmR99yvMrqLZ/FIlin0wHibMG+lHUqfFFzBLtuaoABSesXplsneSglz2Fx6AAu/LgBRkqca5M8Fc9hA==}
     dependencies:
-      '@solana/web3.js': 1.54.0
+      '@solana/web3.js': 1.54.1
       bignumber.js: 9.1.0
       bn.js: 5.2.1
       borsh: 0.3.1
@@ -1021,7 +1021,7 @@ packages:
     dependencies:
       '@babel/runtime': 7.18.9
       '@solana/buffer-layout': 3.0.0
-      '@solana/web3.js': 1.54.0
+      '@solana/web3.js': 1.54.1
       bn.js: 5.2.1
       buffer: 6.0.3
       buffer-layout: 1.2.2
@@ -1032,7 +1032,7 @@ packages:
       - utf-8-validate
     patched: true
 
-  /@solana/spl-token/0.3.4_@solana+web3.js@1.54.0:
+  /@solana/spl-token/0.3.4_@solana+web3.js@1.54.1:
     resolution: {integrity: sha512-Mi1vk6qf9eeXjB5X6GKo0ePbOorl/CpTqQediohhjefYmanH2K9KxpckUfwV8VQkWSNTKCyrTfkyDWuljFBVNw==}
     engines: {node: '>=16'}
     peerDependencies:
@@ -1040,7 +1040,7 @@ packages:
     dependencies:
       '@solana/buffer-layout': 4.0.0
       '@solana/buffer-layout-utils': 0.2.0
-      '@solana/web3.js': 1.54.0
+      '@solana/web3.js': 1.54.1
       buffer: 6.0.3
     transitivePeerDependencies:
       - bufferutil
@@ -1048,12 +1048,14 @@ packages:
       - utf-8-validate
     dev: true
 
-  /@solana/web3.js/1.54.0:
-    resolution: {integrity: sha512-Bz0OKYF5UM2vwY6eSTgBBSAVNOk5icyIXbviO99OvX0i2gmRlfd3rocTXRQWHK/tupZ7PBVd6Vux34qpeOr8Yw==}
+  /@solana/web3.js/1.54.1:
+    resolution: {integrity: sha512-/PViPDGxF6oZZidcILndlm0MdbuzBouiQcqxrAfiBZ4lHMntLE4U75KhC+205EkVnkgCC4/prkjKVeSnbkfzrw==}
     engines: {node: '>=12.20.0'}
     dependencies:
       '@babel/runtime': 7.18.9
-      '@ethersproject/sha2': 5.7.0
+      '@noble/ed25519': 1.7.0
+      '@noble/hashes': 1.1.2
+      '@noble/secp256k1': 1.6.3
       '@solana/buffer-layout': 4.0.0
       bigint-buffer: 1.1.5
       bn.js: 5.2.1
@@ -1065,9 +1067,7 @@ packages:
       js-sha3: 0.8.0
       node-fetch: 2.6.7
       rpc-websockets: 7.5.0
-      secp256k1: 4.0.3
       superstruct: 0.14.2
-      tweetnacl: 1.0.3
     transitivePeerDependencies:
       - bufferutil
       - encoding
@@ -1600,9 +1600,6 @@ packages:
     dependencies:
       file-uri-to-path: 1.0.0
 
-  /bn.js/4.12.0:
-    resolution: {integrity: sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA==}
-
   /bn.js/5.2.1:
     resolution: {integrity: sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==}
 
@@ -1649,15 +1646,12 @@ packages:
       fill-range: 7.0.1
     dev: true
 
-  /brorand/1.1.0:
-    resolution: {integrity: sha512-cKV8tMCEpQs4hK/ik71d6LrPOnpkpGBR0wzxqr68g2m/LB2GxVYQroAjMJZRVM1Y4BCjCKc3vAamxSzOY2RP+w==}
-
   /browserslist/4.21.3:
     resolution: {integrity: sha512-898rgRXLAyRkM1GryrrBHGkqA5hlpkV5MhtZwg9QXeiyLUYs2k00Un05aX5l2/yJIOObYKOpS2JNo8nJDE7fWQ==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
     hasBin: true
     dependencies:
-      caniuse-lite: 1.0.30001383
+      caniuse-lite: 1.0.30001384
       electron-to-chromium: 1.4.233
       node-releases: 2.0.6
       update-browserslist-db: 1.0.5_browserslist@4.21.3
@@ -1744,8 +1738,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /caniuse-lite/1.0.30001383:
-    resolution: {integrity: sha512-swMpEoTp5vDoGBZsYZX7L7nXHe6dsHxi9o6/LKf/f0LukVtnrxly5GVb/fWdCDTqi/yw6Km6tiJ0pmBacm0gbg==}
+  /caniuse-lite/1.0.30001384:
+    resolution: {integrity: sha512-BBWt57kqWbc0GYZXb47wTXpmAgqr5LSibPzNjk/AWMdmJMQhLqOl3c/Kd4OAU/tu4NLfYkMx8Tlq3RVBkOBolQ==}
     dev: true
 
   /chalk/2.4.2:
@@ -2032,17 +2026,6 @@ packages:
   /electron-to-chromium/1.4.233:
     resolution: {integrity: sha512-ejwIKXTg1wqbmkcRJh9Ur3hFGHFDZDw1POzdsVrB2WZjgRuRMHIQQKNpe64N/qh3ZtH2otEoRoS+s6arAAuAAw==}
     dev: true
-
-  /elliptic/6.5.4:
-    resolution: {integrity: sha512-iLhC6ULemrljPZb+QutR5TQGB+pdW6KGD5RSegS+8sorOZT+rdQFbsQFJgvN3eRqNALqJer4oQ16YvJHlU8hzQ==}
-    dependencies:
-      bn.js: 4.12.0
-      brorand: 1.1.0
-      hash.js: 1.1.7
-      hmac-drbg: 1.0.1
-      inherits: 2.0.4
-      minimalistic-assert: 1.0.1
-      minimalistic-crypto-utils: 1.0.1
 
   /emittery/0.10.2:
     resolution: {integrity: sha512-aITqOwnLanpHLNXZJENbOgjUBeHocD+xsSJmNrjovKBW5HbSpW3d1pEls7GFQPUWXiwG9+0P4GtHfEqC/4M0Iw==}
@@ -2617,19 +2600,6 @@ packages:
       function-bind: 1.1.1
     dev: true
 
-  /hash.js/1.1.7:
-    resolution: {integrity: sha512-taOaskGt4z4SOANNseOviYDvjEJinIkRgmp7LbKP2YTTmVxWBl87s/uzK9r+44BclBSp2X7K1hqeNfz9JbBeXA==}
-    dependencies:
-      inherits: 2.0.4
-      minimalistic-assert: 1.0.1
-
-  /hmac-drbg/1.0.1:
-    resolution: {integrity: sha512-Tti3gMqLdZfhOQY1Mzf/AanLiqh1WTiJgEj26ZuYQ9fbkLomzGchCws4FyrSd4VkpBfiNhaE1On+lOz894jvXg==}
-    dependencies:
-      hash.js: 1.1.7
-      minimalistic-assert: 1.0.1
-      minimalistic-crypto-utils: 1.0.1
-
   /homedir-polyfill/1.0.3:
     resolution: {integrity: sha512-eSmmWE5bZTK2Nou4g0AI3zZ9rswp7GRKoKXS1BLUkvPviOqs4YTN1djQIqrXy9k5gEtdLPy86JjRwsNM9tnDcA==}
     engines: {node: '>=0.10.0'}
@@ -2721,6 +2691,7 @@ packages:
 
   /inherits/2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
+    dev: true
 
   /ini/1.3.8:
     resolution: {integrity: sha512-JV/yugV2uzW5iMRSiZAyDtQd+nxtUnjeLt0acNdw98kKLrvuRVyB80tsREOE7yvGVgalhZ6RNXCmEHkUKBKxew==}
@@ -3570,12 +3541,6 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
-  /minimalistic-assert/1.0.1:
-    resolution: {integrity: sha512-UtJcAD4yEaGtjPezWuO9wC4nwUnVH/8/Im3yEHQP4b67cXlD/Qr9hdITCU1xDbSEXg2XKNaP8jsReV7vQd00/A==}
-
-  /minimalistic-crypto-utils/1.0.1:
-    resolution: {integrity: sha512-JIYlbt6g8i5jKfJ3xz7rF0LXmv2TkDxBLUkiBeZ7bAx4GnnNMr8xFpGnOxn6GhTEHx3SjRrZEoU+j04prX1ktg==}
-
   /minimatch/3.1.2:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
     dependencies:
@@ -3624,9 +3589,6 @@ packages:
     dependencies:
       lower-case: 2.0.2
       tslib: 2.4.0
-
-  /node-addon-api/2.0.2:
-    resolution: {integrity: sha512-Ntyt4AIXyaLIuMHF6IOoTakB3K+RWxwtsHNRxllEoA6vPwP9o4866g6YWDLUdnucilZhmkxiHwHr11gAENw+QA==}
 
   /node-fetch/2.6.7:
     resolution: {integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==}
@@ -4090,15 +4052,6 @@ packages:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
     dev: true
 
-  /secp256k1/4.0.3:
-    resolution: {integrity: sha512-NLZVf+ROMxwtEj3Xa562qgv2BK5e2WNmXPiOdVIPLgs6lyTzMvBq0aWTYMI5XCP9jZMVKOcqZLw/Wc4vDkuxhA==}
-    engines: {node: '>=10.0.0'}
-    requiresBuild: true
-    dependencies:
-      elliptic: 6.5.4
-      node-addon-api: 2.0.2
-      node-gyp-build: 4.5.0
-
   /semver-diff/3.1.1:
     resolution: {integrity: sha512-GX0Ix/CJcHyB8c4ykpHGIAvLyOwOobtM/8d+TQkAd81/bEjgPHrfba41Vpesr7jX/t8Uh+R3EX9eAS5be+jQYg==}
     engines: {node: '>=8'}
@@ -4494,9 +4447,6 @@ packages:
       tslib: 1.14.1
       typescript: 4.7.4
     dev: true
-
-  /tweetnacl/1.0.3:
-    resolution: {integrity: sha512-6rt+RN7aOi1nGMyC4Xa5DdYiukl2UWCbcJft7YhxReBGQD7OAM8Pbxw6YMo4r2diNEA8FEmu32YOn9rhaiE5yw==}
 
   /type-check/0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}

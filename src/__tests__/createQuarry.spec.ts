@@ -13,10 +13,10 @@ import { fs } from 'mz';
 import { parseKeypair } from '@marinade.finance/solana-cli-utils';
 import shellMatchers from 'jest-shell-matchers';
 import { file } from 'tmp-promise';
-import { MultisigHelper, MULTISIG_FACTORIES } from '../testHelpers/multisig';
+import { MultisigHelper, MULTISIG_FACTORIES } from '@marinade.finance/solana-test-utils';
 import { MintHelper } from '@marinade.finance/solana-test-utils';
-import { RewarderHelper } from '../testHelpers/rewarder';
-import { OperatorHelper } from '../testHelpers/operator';
+import { RewarderHelper } from '@marinade.finance/solana-test-utils';
+import { OperatorHelper } from '@marinade.finance/solana-test-utils';
 
 jest.setTimeout(300000);
 

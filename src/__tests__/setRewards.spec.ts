@@ -4,11 +4,11 @@ import { parseKeypair } from '@marinade.finance/solana-cli-utils';
 import { QuarrySDK } from '@quarryprotocol/quarry-sdk';
 import BN from 'bn.js';
 import { shellMatchers } from '@marinade.finance/solana-test-utils';
-import { RewarderHelper } from '../testHelpers/rewarder';
+import { RewarderHelper } from '@marinade.finance/solana-test-utils';
 import { file } from 'tmp-promise';
 import { fs } from 'mz';
-import { OperatorHelper } from '../testHelpers/operator';
-import { MULTISIG_FACTORIES } from '../testHelpers/multisig';
+import { OperatorHelper } from '@marinade.finance/solana-test-utils';
+import { MULTISIG_FACTORIES } from '@marinade.finance/solana-test-utils';
 
 jest.setTimeout(300000);
 
@@ -545,6 +545,79 @@ describe('set-rewards', () => {
       for (let i = 0; i < multisig.numTransactions.toNumber(); i++) {
         await multisig.executeTransaction(
           await multisig.transactionByIndex(new BN(i))
+        );
+      }
+
+      await rewarder.syncQuarries();
+
+      await rewarder.reload();
+      expect(rewarder.wrapper.rewarderData.totalRewardsShares.toString()).toBe(
+        '10000'
+      );
+      for (let i = 0; i < rewarder.quarries.length; i++) {
+        expect(
+          rewarder.quarries[i].wrapper.quarryData.annualRewardsRate.toString()
+        ).toBe(((shares[i] || initialShares[i]) * 200).toString());
+      }
+    });
+
+    it(`Uses 2 instances of ${multisigFactory.name} with operator`, async () => {
+      const rateSetterMultisig = await multisigFactory.create({
+        provider,
+      });
+      const shareAllocatorMultisig = await multisigFactory.create({
+        provider,
+      });
+      const rewarder = await RewarderHelper.create({
+        sdk,
+        admin: OperatorHelper.prepare({
+          sdk,
+          rateSetter: rateSetterMultisig,
+          shareAllocator: shareAllocatorMultisig,
+        }),
+        rate: initialRate,
+        quarryShares: initialShares,
+      });
+
+      const shares = [3256, 5797]; // + intial_shares = 10000 total
+      await expect([
+        'pnpm',
+        [
+          'cli',
+          'set-rewards',
+          '--rewarder',
+          rewarder.address.toBase58(),
+          ...shares
+            .map((s, i) => [
+              '--share',
+              rewarder.quarries[i].mint.address + ':' + s,
+            ])
+            .flat(),
+          '--total-rewards',
+          2000000,
+        ],
+      ]).toHaveMatchingSpawnOutput({
+        code: 0,
+        stderr: '',
+      });
+
+      await rateSetterMultisig.reload();
+      expect(rateSetterMultisig.numTransactions.toString()).not.toBe('0');
+      await shareAllocatorMultisig.reload();
+      expect(shareAllocatorMultisig.numTransactions.toString()).not.toBe('0');
+
+      for (let i = 0; i < rateSetterMultisig.numTransactions.toNumber(); i++) {
+        await rateSetterMultisig.executeTransaction(
+          await rateSetterMultisig.transactionByIndex(new BN(i))
+        );
+      }
+      for (
+        let i = 0;
+        i < shareAllocatorMultisig.numTransactions.toNumber();
+        i++
+      ) {
+        await shareAllocatorMultisig.executeTransaction(
+          await shareAllocatorMultisig.transactionByIndex(new BN(i))
         );
       }
 
