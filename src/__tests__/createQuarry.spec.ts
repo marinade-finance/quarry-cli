@@ -9,11 +9,13 @@ import {
 import { createInitMintInstructions, Token } from '@saberhq/token-utils';
 import { Connection, Keypair } from '@solana/web3.js';
 import BN from 'bn.js';
-import { fs } from 'mz';
 import { parseKeypair } from '@marinade.finance/solana-cli-utils';
 import shellMatchers from 'jest-shell-matchers';
-import { file } from 'tmp-promise';
-import { MultisigHelper, MULTISIG_FACTORIES } from '@marinade.finance/solana-test-utils';
+import {
+  createTempFileKeypair,
+  KeypairSignerHelper,
+  MULTISIG_FACTORIES,
+} from '@marinade.finance/solana-test-utils';
 import { MintHelper } from '@marinade.finance/solana-test-utils';
 import { RewarderHelper } from '@marinade.finance/solana-test-utils';
 import { OperatorHelper } from '@marinade.finance/solana-test-utils';
@@ -72,13 +74,15 @@ describe('create-quarry', () => {
   });
 
   it('Runs with filesystem wallet admin', async () => {
-    const admin = new Keypair();
-    const { path: adminPath, cleanup } = await file();
-    await fs.writeFile(adminPath, JSON.stringify(Array.from(admin.secretKey)));
+    const {
+      keypair: admin,
+      path: adminPath,
+      cleanup,
+    } = await createTempFileKeypair();
 
     const rewarder = await RewarderHelper.create({
       sdk,
-      admin,
+      admin: new KeypairSignerHelper(admin),
     });
 
     await expect([
@@ -139,15 +143,17 @@ describe('create-quarry', () => {
   });
 
   it('Runs with filesystem wallet operator', async () => {
-    const admin = new Keypair();
-    const { path: adminPath, cleanup } = await file();
-    await fs.writeFile(adminPath, JSON.stringify(Array.from(admin.secretKey)));
+    const {
+      keypair: admin,
+      path: adminPath,
+      cleanup,
+    } = await createTempFileKeypair();
 
     const rewarder = await RewarderHelper.create({
       sdk,
       admin: OperatorHelper.prepare({
         sdk,
-        quarryCreator: admin,
+        quarryCreator: new KeypairSignerHelper(admin),
       }),
     });
 
@@ -219,12 +225,11 @@ describe('create-quarry', () => {
       });
 
       it(`Uses ${multisigFactory.name} with filesystem proposer`, async () => {
-        const proposer = new Keypair();
-        const { path: proposerPath, cleanup } = await file();
-        await fs.writeFile(
-          proposerPath,
-          JSON.stringify(Array.from(proposer.secretKey))
-        );
+        const {
+          keypair: proposer,
+          path: proposerPath,
+          cleanup,
+        } = await createTempFileKeypair();
 
         const multisig = await multisigFactory.create({
           provider,

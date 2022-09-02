@@ -20,7 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "@gokiprotocol/client": "^0.11.1",
-    "@marinade.finance/solana-cli-utils": "^0.0.13",
+    "@marinade.finance/solana-cli-utils": "^0.0.16",
     "@project-serum/anchor": "~0.24.2",
     "@quarryprotocol/quarry-sdk": "^5.2.0",
     "@saberhq/anchor-contrib": "^1.14.4",
@@ -32,11 +32,11 @@
     "jsbi": "^4.3.0"
   },
   "devDependencies": {
-    "@marinade.finance/solana-test-utils": "^0.0.14",
+    "@marinade.finance/solana-test-utils": "^0.0.17",
     "@types/bn.js": "^5.1.0",
     "@types/jest": "^28.1.8",
     "@types/mz": "^2.7.4",
-    "@types/node": "^18.7.13",
+    "@types/node": "^18.7.14",
     "@types/node-fetch": "^2.6.2",
     "gts": "^3.1.0",
     "jest": "^28.1.3",

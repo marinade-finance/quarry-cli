@@ -3,10 +3,12 @@ import { Connection, Keypair } from '@solana/web3.js';
 import { parseKeypair } from '@marinade.finance/solana-cli-utils';
 import { QuarrySDK } from '@quarryprotocol/quarry-sdk';
 import BN from 'bn.js';
-import { shellMatchers } from '@marinade.finance/solana-test-utils';
+import {
+  createTempFileKeypair,
+  KeypairSignerHelper,
+  shellMatchers,
+} from '@marinade.finance/solana-test-utils';
 import { RewarderHelper } from '@marinade.finance/solana-test-utils';
-import { file } from 'tmp-promise';
-import { fs } from 'mz';
 import { OperatorHelper } from '@marinade.finance/solana-test-utils';
 import { MULTISIG_FACTORIES } from '@marinade.finance/solana-test-utils';
 
@@ -216,13 +218,15 @@ describe('set-rewards', () => {
   });
 
   it('It sets quarry shares and total rate with filesystem wallet admin', async () => {
-    const admin = new Keypair();
-    const { path: adminPath, cleanup } = await file();
-    await fs.writeFile(adminPath, JSON.stringify(Array.from(admin.secretKey)));
+    const {
+      keypair: admin,
+      path: adminPath,
+      cleanup,
+    } = await createTempFileKeypair();
 
     const rewarder = await RewarderHelper.create({
       sdk,
-      admin,
+      admin: new KeypairSignerHelper(admin),
       rate: initialRate,
       quarryShares: initialShares,
     });
@@ -306,27 +310,23 @@ describe('set-rewards', () => {
   });
 
   it('It sets quarry shares and total rate with filesystem wallet operator', async () => {
-    const rateSetter = new Keypair();
-    const { path: rateSetterPath, cleanup: rateSetterCleanup } = await file();
-    await fs.writeFile(
-      rateSetterPath,
-      JSON.stringify(Array.from(rateSetter.secretKey))
-    );
-
-    const shareAllocator = new Keypair();
-    const { path: shareAllocatorPath, cleanup: shareAllocatorCleanup } =
-      await file();
-    await fs.writeFile(
-      shareAllocatorPath,
-      JSON.stringify(Array.from(shareAllocator.secretKey))
-    );
+    const {
+      keypair: rateSetter,
+      path: rateSetterPath,
+      cleanup: rateSetterCleanup,
+    } = await createTempFileKeypair();
+    const {
+      keypair: shareAllocator,
+      path: shareAllocatorPath,
+      cleanup: shareAllocatorCleanup,
+    } = await createTempFileKeypair();
 
     const rewarder = await RewarderHelper.create({
       sdk,
       admin: OperatorHelper.prepare({
         sdk,
-        rateSetter,
-        shareAllocator,
+        rateSetter: new KeypairSignerHelper(rateSetter),
+        shareAllocator: new KeypairSignerHelper(shareAllocator),
       }),
       rate: initialRate,
       quarryShares: initialShares,
@@ -430,12 +430,11 @@ describe('set-rewards', () => {
       });
 
       it(`Uses ${multisigFactory.name} with filesystem proposer`, async () => {
-        const proposer = new Keypair();
-        const { path: proposerPath, cleanup } = await file();
-        await fs.writeFile(
-          proposerPath,
-          JSON.stringify(Array.from(proposer.secretKey))
-        );
+        const {
+          keypair: proposer,
+          path: proposerPath,
+          cleanup,
+        } = await createTempFileKeypair();
 
         const multisig = await multisigFactory.create({
           provider,
