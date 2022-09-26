@@ -32,6 +32,7 @@ export function installCreateQuarry(program: Command) {
     .option('--rent-payer <keypair>', 'Rent payer', parseKeypair)
     .option('--proposer <keypair>', 'Proposer', parseKeypair)
     .option('--log-only', 'Do not create multisig transaction')
+    .option('--community', 'Create community proposal')
     .action(
       async ({
         rewarder,
@@ -40,6 +41,7 @@ export function installCreateQuarry(program: Command) {
         rentPayer,
         proposer,
         logOnly,
+        community,
       }: {
         rewarder: Promise<PublicKey>;
         stake: Promise<PublicKey>;
@@ -47,6 +49,7 @@ export function installCreateQuarry(program: Command) {
         rentPayer?: Promise<Keypair>;
         proposer?: Promise<Keypair>;
         logOnly?: boolean;
+        community?: boolean;
       }) => {
         const context = useContext();
         await createQuarry({
@@ -58,6 +61,7 @@ export function installCreateQuarry(program: Command) {
           rentPayer: await rentPayer,
           proposer: await proposer,
           logOnly,
+          community,
           simulate: context.simulate,
         });
       }
@@ -73,6 +77,7 @@ export async function createQuarry({
   rentPayer,
   proposer,
   logOnly,
+  community = false,
   simulate,
 }: {
   quarry: QuarrySDK;
@@ -83,6 +88,7 @@ export async function createQuarry({
   rentPayer?: Keypair;
   proposer?: Keypair;
   logOnly?: boolean;
+  community?: boolean;
   simulate?: boolean;
 }) {
   const rewarderWrapper = await quarry.mine.loadRewarderWrapper(rewarder);
@@ -117,6 +123,7 @@ export async function createQuarry({
     proposer,
     rentPayer,
     logOnly,
+    community,
   });
 
   let tx = new TransactionEnvelope(quarry.provider, []);

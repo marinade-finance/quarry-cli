@@ -9,8 +9,8 @@ patchedDependencies:
 
 specifiers:
   '@gokiprotocol/client': ^0.11.1
-  '@marinade.finance/solana-cli-utils': ^0.0.28
-  '@marinade.finance/solana-test-utils': ^0.0.33
+  '@marinade.finance/solana-cli-utils': ^0.0.35
+  '@marinade.finance/solana-test-utils': ^0.0.35
   '@project-serum/anchor': ~0.24.2
   '@quarryprotocol/quarry-sdk': ^5.2.0
   '@saberhq/anchor-contrib': ^1.14.4
@@ -37,7 +37,7 @@ specifiers:
 
 dependencies:
   '@gokiprotocol/client': 0.11.1_otacu3s4ammcqphdeuiyzg5hki
-  '@marinade.finance/solana-cli-utils': 0.0.28_u7p3ip5vzghfntr3hat4zjgjoy
+  '@marinade.finance/solana-cli-utils': 0.0.35_u7p3ip5vzghfntr3hat4zjgjoy
   '@project-serum/anchor': 0.24.2
   '@quarryprotocol/quarry-sdk': 5.2.0_izvux55bovyqufvsbngwyuozli
   '@saberhq/anchor-contrib': 1.14.6_ux3dy3liwnshd2tddqnci2ilja
@@ -50,7 +50,7 @@ dependencies:
   jsbi: 4.3.0
 
 devDependencies:
-  '@marinade.finance/solana-test-utils': 0.0.33_jznadussgcr2k2bbheproo4pbm
+  '@marinade.finance/solana-test-utils': 0.0.35_jznadussgcr2k2bbheproo4pbm
   '@types/bn.js': 5.1.1
   '@types/jest': 28.1.8
   '@types/mz': 2.7.4
@@ -744,8 +744,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
-  /@marinade.finance/solana-cli-utils/0.0.28_u7p3ip5vzghfntr3hat4zjgjoy:
-    resolution: {integrity: sha512-chZ5EIH8FBFbglf/GE05ApIoHo81/0nQl4Q7KizH3fvTgdIXhDsit3mfKmwRza7wVpZc7/sluhR6ps3r9fq98Q==}
+  /@marinade.finance/solana-cli-utils/0.0.35_u7p3ip5vzghfntr3hat4zjgjoy:
+    resolution: {integrity: sha512-ubt2e5hbp9zVcIgsxfDNvphct0E3fyRyN8uReqcwNLjJ8ERKKhdRWLhRIx+3uvn+xpoSyrbTqYrRbdhUqGRY1w==}
     peerDependencies:
       '@gokiprotocol/client': ^0.11.1
       '@project-serum/anchor': '0.24'
@@ -772,8 +772,8 @@ packages:
       - encoding
       - utf-8-validate
 
-  /@marinade.finance/solana-test-utils/0.0.33_jznadussgcr2k2bbheproo4pbm:
-    resolution: {integrity: sha512-nR7QFEW+lsxulZDj9+mHpZ0jXLw+fu4/P+KZNWSee4Li74n21xRbCJqI+buE5nXRlrHM4BX31DVue4DusA9IXA==}
+  /@marinade.finance/solana-test-utils/0.0.35_jznadussgcr2k2bbheproo4pbm:
+    resolution: {integrity: sha512-8cQ7tlO4OTolwMA4UZLNVWt0iDwpoNwdr67gIeOE4gY6QkW2y0oQMfTJaRRuVC1c+yM/MUgJLzV4lgP9g88fZg==}
     engines: {node: '>10'}
     peerDependencies:
       '@gokiprotocol/client': ^0.11.1
@@ -788,7 +788,7 @@ packages:
       jsbi: ^4.3.0
     dependencies:
       '@gokiprotocol/client': 0.11.1_otacu3s4ammcqphdeuiyzg5hki
-      '@marinade.finance/solana-cli-utils': 0.0.28_u7p3ip5vzghfntr3hat4zjgjoy
+      '@marinade.finance/solana-cli-utils': 0.0.35_u7p3ip5vzghfntr3hat4zjgjoy
       '@project-serum/anchor': 0.24.2
       '@quarryprotocol/quarry-sdk': 5.2.0_izvux55bovyqufvsbngwyuozli
       '@saberhq/anchor-contrib': 1.14.6_ux3dy3liwnshd2tddqnci2ilja

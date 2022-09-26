@@ -66,6 +66,8 @@ export function installSetRewards(program: Command) {
     .option('--rate-setter <keypair>', 'Rate setter', parseKeypair)
     .option('--rent-payer <keypair>', 'Rent payer', parseKeypair)
     .option('--proposer <keypair>', 'Proposer', parseKeypair)
+    .option('--log-only', 'Do not create multisig transaction')
+    .option('--community', 'Create community proposal')
     .action(
       async ({
         rewarder,
@@ -79,6 +81,8 @@ export function installSetRewards(program: Command) {
         rateSetter,
         rentPayer,
         proposer,
+        logOnly,
+        community = false,
       }: {
         rewarder: Promise<PublicKey>;
         share?: QuarryShare[];
@@ -91,6 +95,8 @@ export function installSetRewards(program: Command) {
         rateSetter?: Promise<Keypair>;
         rentPayer?: Promise<Keypair>;
         proposer?: Promise<Keypair>;
+        logOnly?: boolean;
+        community?: boolean;
       }) => {
         const context = useContext();
         let multiplier = new BN(1);
@@ -120,6 +126,7 @@ export function installSetRewards(program: Command) {
           rateSetter: await rateSetter,
           rentPayer: await rentPayer,
           proposer: await proposer,
+          community,
           simulate: context.simulate,
         });
       }
@@ -139,6 +146,7 @@ export async function setRewards({
   rentPayer,
   proposer,
   logOnly,
+  community = false,
   simulate,
 }: {
   quarry: QuarrySDK;
@@ -153,6 +161,7 @@ export async function setRewards({
   rentPayer?: Keypair;
   proposer?: Keypair;
   logOnly?: boolean;
+  community?: boolean;
   simulate?: boolean;
 }) {
   const rewarderWrapper = await quarry.mine.loadRewarderWrapper(rewarder);
@@ -231,6 +240,7 @@ export async function setRewards({
       proposer,
       rentPayer,
       logOnly,
+      community,
     });
     if (middleware.length > 0) {
       hasMultisigs = true;
@@ -321,6 +331,7 @@ export async function setRewards({
       proposer,
       rentPayer,
       logOnly,
+      community,
     });
     if (middleware.length > 0) {
       hasMultisigs = true;

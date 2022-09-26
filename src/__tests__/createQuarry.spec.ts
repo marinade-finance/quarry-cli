@@ -203,7 +203,7 @@ describe('create-quarry', () => {
             rewarder.address.toBase58(),
             '--stake',
             mint.address.toBase58(),
-          ],
+          ].concat(multisigFactory.side === 'community' ? ['--community'] : []),
         ]).toHaveMatchingSpawnOutput({
           code: 0,
           stderr: '',
@@ -256,7 +256,7 @@ describe('create-quarry', () => {
             mint.address.toBase58(),
             '--proposer',
             proposerPath,
-          ],
+          ].concat(multisigFactory.side === 'community' ? ['--community'] : []),
         ]).toHaveMatchingSpawnOutput({
           code: 0,
           stderr: '',
@@ -301,7 +301,7 @@ describe('create-quarry', () => {
             rewarder.address.toBase58(),
             '--stake',
             mint.address.toBase58(),
-          ],
+          ].concat(multisigFactory.side === 'community' ? ['--community'] : []),
         ]).toHaveMatchingSpawnOutput({
           code: 0,
           stderr: '',

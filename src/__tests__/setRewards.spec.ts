@@ -401,7 +401,7 @@ describe('set-rewards', () => {
               .flat(),
             '--total-rewards',
             2000000,
-          ],
+          ].concat(multisigFactory.side === 'community' ? ['--community'] : []),
         ]).toHaveMatchingSpawnOutput({
           code: 0,
           stderr: '',
@@ -473,7 +473,7 @@ describe('set-rewards', () => {
             2000000,
             '--proposer',
             proposerPath,
-          ],
+          ].concat(multisigFactory.side === 'community' ? ['--community'] : []),
         ]).toHaveMatchingSpawnOutput({
           code: 0,
           stderr: '',
@@ -535,7 +535,7 @@ describe('set-rewards', () => {
             .flat(),
           '--total-rewards',
           2000000,
-        ],
+        ].concat(multisigFactory.side === 'community' ? ['--community'] : []),
       ]).toHaveMatchingSpawnOutput({
         code: 0,
         stderr: '',
@@ -597,7 +597,7 @@ describe('set-rewards', () => {
             .flat(),
           '--total-rewards',
           2000000,
-        ],
+        ].concat(multisigFactory.side === 'community' ? ['--community'] : []),
       ]).toHaveMatchingSpawnOutput({
         code: 0,
         stderr: '',
