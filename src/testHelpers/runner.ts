@@ -22,4 +22,8 @@ run([
     address: new PublicKey('GokivDYuQXPZCWRkwMhdH2h91KpDQXBEmpgBgs55bnpH'),
     path: 'fixtures/goki-smart-wallet.so',
   },
+  {
+    address: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    path: 'fixtures/spl-governance.so',
+  },
 ]);

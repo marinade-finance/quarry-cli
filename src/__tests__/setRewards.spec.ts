@@ -438,9 +438,12 @@ describe('set-rewards', () => {
 
         const multisig = await multisigFactory.create({
           provider,
-          members: [proposer, new Keypair(), new Keypair()],
+          members: [
+            new KeypairSignerHelper(proposer),
+            new KeypairSignerHelper(new Keypair()),
+            new KeypairSignerHelper(new Keypair()),
+          ],
           threshold: new BN(2),
-          includeWallet: false,
         });
 
         const rewarder = await RewarderHelper.create({
