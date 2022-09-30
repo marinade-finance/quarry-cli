@@ -24,6 +24,7 @@ import {
   parsePubkey,
   middleware as m,
 } from '@marinade.finance/solana-cli-utils';
+import { KedgereeSDK } from '@marinade.finance/kedgeree-sdk';
 
 export interface QuarryShare {
   mint: PublicKey;
@@ -117,6 +118,7 @@ export function installSetRewards(program: Command) {
         await setRewards({
           quarry: context.quarry,
           goki: context.goki,
+          kedgeree: context.kedgeree,
           rewarder: await rewarder,
           shares: share,
           rewardsPerShare,
@@ -136,6 +138,7 @@ export function installSetRewards(program: Command) {
 export async function setRewards({
   quarry,
   goki,
+  kedgeree,
   rewarder,
   shares,
   rewardsPerShare,
@@ -151,6 +154,7 @@ export async function setRewards({
 }: {
   quarry: QuarrySDK;
   goki: GokiSDK;
+  kedgeree: KedgereeSDK;
   rewarder: PublicKey;
   shares?: QuarryShare[];
   rewardsPerShare?: BN;
@@ -236,6 +240,7 @@ export async function setRewards({
     await m.installMultisigMiddleware({
       middleware,
       goki,
+      kedgeree,
       address: shareAllocatorAuthority,
       proposer,
       rentPayer,
@@ -327,6 +332,7 @@ export async function setRewards({
     await m.installMultisigMiddleware({
       middleware,
       goki,
+      kedgeree,
       address: rateSetterAuthority,
       proposer,
       rentPayer,

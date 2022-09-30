@@ -15,6 +15,7 @@ import {
   parsePubkey,
   middleware as m,
 } from '@marinade.finance/solana-cli-utils';
+import { KedgereeSDK } from '@marinade.finance/kedgeree-sdk';
 
 export function installCreateQuarry(program: Command) {
   program
@@ -55,6 +56,7 @@ export function installCreateQuarry(program: Command) {
         await createQuarry({
           quarry: context.quarry,
           goki: context.goki,
+          kedgeree: context.kedgeree,
           rewarder: await rewarder,
           stake: await stake,
           admin: await admin,
@@ -71,6 +73,7 @@ export function installCreateQuarry(program: Command) {
 export async function createQuarry({
   quarry,
   goki,
+  kedgeree,
   rewarder,
   stake,
   admin,
@@ -82,6 +85,7 @@ export async function createQuarry({
 }: {
   quarry: QuarrySDK;
   goki: GokiSDK;
+  kedgeree: KedgereeSDK;
   rewarder: PublicKey;
   stake: PublicKey;
   admin?: Keypair;
@@ -119,6 +123,7 @@ export async function createQuarry({
   await m.installMultisigMiddleware({
     middleware,
     goki,
+    kedgeree,
     address: quarryCreator,
     proposer,
     rentPayer,

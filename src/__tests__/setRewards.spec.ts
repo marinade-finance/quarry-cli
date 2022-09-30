@@ -11,6 +11,7 @@ import {
 import { RewarderHelper } from '@marinade.finance/solana-test-utils';
 import { OperatorHelper } from '@marinade.finance/solana-test-utils';
 import { MULTISIG_FACTORIES } from '@marinade.finance/solana-test-utils';
+import { KedgereeSDK } from '@marinade.finance/kedgeree-sdk';
 
 jest.setTimeout(300000);
 
@@ -23,6 +24,7 @@ beforeAll(() => {
 describe('set-rewards', () => {
   let provider: SolanaProvider;
   let sdk: QuarrySDK;
+  let kedgeree: KedgereeSDK;
   // let mintKeypair: Keypair;
   // let rewarderWrapper: RewarderWrapper;
   // let quarries: { mint: MintHelper; quarry: QuarryWrapper }[];
@@ -35,6 +37,7 @@ describe('set-rewards', () => {
       wallet: new SignerWallet(await parseKeypair('~/.config/solana/id.json')),
     });
     sdk = QuarrySDK.load({ provider });
+    kedgeree = new KedgereeSDK({ provider });
   });
 
   /*
@@ -374,7 +377,7 @@ describe('set-rewards', () => {
     describe(`Multisig ${multisigFactory.name}`, () => {
       it(`Uses ${multisigFactory.name}`, async () => {
         const multisig = await multisigFactory.create({
-          provider,
+          kedgeree,
         });
         const rewarder = await RewarderHelper.create({
           sdk,
@@ -437,7 +440,7 @@ describe('set-rewards', () => {
         } = await createTempFileKeypair();
 
         const multisig = await multisigFactory.create({
-          provider,
+          kedgeree,
           members: [
             new KeypairSignerHelper(proposer),
             new KeypairSignerHelper(new Keypair()),
@@ -504,7 +507,7 @@ describe('set-rewards', () => {
 
     it(`Uses ${multisigFactory.name} with operator`, async () => {
       const multisig = await multisigFactory.create({
-        provider,
+        kedgeree,
       });
       const rewarder = await RewarderHelper.create({
         sdk,
@@ -565,10 +568,10 @@ describe('set-rewards', () => {
 
     it(`Uses 2 instances of ${multisigFactory.name} with operator`, async () => {
       const rateSetterMultisig = await multisigFactory.create({
-        provider,
+        kedgeree,
       });
       const shareAllocatorMultisig = await multisigFactory.create({
-        provider,
+        kedgeree,
       });
       const rewarder = await RewarderHelper.create({
         sdk,

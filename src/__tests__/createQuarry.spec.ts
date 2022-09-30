@@ -19,6 +19,7 @@ import {
 import { MintHelper } from '@marinade.finance/solana-test-utils';
 import { RewarderHelper } from '@marinade.finance/solana-test-utils';
 import { OperatorHelper } from '@marinade.finance/solana-test-utils';
+import { KedgereeSDK } from '@marinade.finance/kedgeree-sdk';
 
 jest.setTimeout(300000);
 
@@ -31,6 +32,7 @@ beforeAll(() => {
 describe('create-quarry', () => {
   let provider: Provider;
   let sdk: QuarrySDK;
+  let kedgeree: KedgereeSDK;
   let mint: MintHelper;
 
   beforeAll(async () => {
@@ -39,6 +41,7 @@ describe('create-quarry', () => {
       wallet: new SignerWallet(await parseKeypair('~/.config/solana/id.json')),
     });
     sdk = QuarrySDK.load({ provider });
+    kedgeree = new KedgereeSDK({ provider });
   });
 
   beforeEach(async () => {
@@ -187,7 +190,7 @@ describe('create-quarry', () => {
     describe(`Multisig ${multisigFactory.name}`, () => {
       it(`Uses ${multisigFactory.name}`, async () => {
         const multisig = await multisigFactory.create({
-          provider,
+          kedgeree,
         });
         const rewarder = await RewarderHelper.create({
           sdk,
@@ -232,7 +235,7 @@ describe('create-quarry', () => {
         } = await createTempFileKeypair();
 
         const multisig = await multisigFactory.create({
-          provider,
+          kedgeree,
           members: [
             new KeypairSignerHelper(proposer),
             new KeypairSignerHelper(new Keypair()),
@@ -281,7 +284,7 @@ describe('create-quarry', () => {
 
       it(`Uses ${multisigFactory.name} with operator`, async () => {
         const multisig = await multisigFactory.create({
-          provider,
+          kedgeree,
         });
 
         const rewarder = await RewarderHelper.create({

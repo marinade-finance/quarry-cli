@@ -1,4 +1,5 @@
 import { GokiSDK } from '@gokiprotocol/client';
+import { KedgereeSDK } from '@marinade.finance/kedgeree-sdk';
 import { QuarrySDK } from '@quarryprotocol/quarry-sdk';
 import { SignerWallet, SolanaProvider } from '@saberhq/solana-contrib';
 import { Connection, Keypair } from '@solana/web3.js';
@@ -6,16 +7,19 @@ import { Connection, Keypair } from '@solana/web3.js';
 export interface Context {
   quarry: QuarrySDK;
   goki: GokiSDK;
+  kedgeree: KedgereeSDK;
   simulate: boolean;
 }
 
 const context: {
   quarry: QuarrySDK | null;
   goki: GokiSDK | null;
+  kedgeree: KedgereeSDK | null;
   simulate: boolean;
 } = {
   quarry: null,
   goki: null,
+  kedgeree: null,
   simulate: false,
 };
 
@@ -34,6 +38,7 @@ export const setContext = ({
   });
   context.quarry = QuarrySDK.load({ provider });
   context.goki = GokiSDK.load({ provider });
+  context.kedgeree = new KedgereeSDK({ provider });
   context.simulate = simulate;
 };
 
