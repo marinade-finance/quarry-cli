@@ -385,8 +385,6 @@ describe('set-rewards', () => {
           rate: initialRate,
           quarryShares: initialShares,
         });
-        await multisig.reload();
-        expect(multisig.numTransactions.toString()).toBe('1');
 
         const shares = [3256, 5797]; // + intial_shares = 10000 total
         await expect([
@@ -410,14 +408,9 @@ describe('set-rewards', () => {
           stderr: '',
         });
 
-        await multisig.reload();
-        expect(multisig.numTransactions.toString()).not.toBe('1');
-
-        for (let i = 1; i < multisig.numTransactions.toNumber(); i++) {
-          await multisig.executeTransaction(
-            await multisig.transactionByIndex(new BN(i))
-          );
-        }
+        await expect(
+          multisig.executeAllPending().then(t => t.length)
+        ).resolves.toBeGreaterThan(0);
 
         await rewarder.syncQuarries();
 
@@ -446,7 +439,7 @@ describe('set-rewards', () => {
             new KeypairSignerHelper(new Keypair()),
             new KeypairSignerHelper(new Keypair()),
           ],
-          threshold: new BN(2),
+          threshold: 2,
         });
 
         const rewarder = await RewarderHelper.create({
@@ -455,8 +448,6 @@ describe('set-rewards', () => {
           rate: initialRate,
           quarryShares: initialShares,
         });
-        await multisig.reload();
-        expect(multisig.numTransactions.toString()).toBe('1');
 
         const shares = [3256, 5797]; // + intial_shares = 10000 total
         await expect([
@@ -482,14 +473,10 @@ describe('set-rewards', () => {
           stderr: '',
         });
 
-        await multisig.reload();
-        expect(multisig.numTransactions.toString()).not.toBe('1');
+        await expect(
+          multisig.executeAllPending().then(t => t.length)
+        ).resolves.toBeGreaterThan(0);
 
-        for (let i = 1; i < multisig.numTransactions.toNumber(); i++) {
-          await multisig.executeTransaction(
-            await multisig.transactionByIndex(new BN(i))
-          );
-        }
         await rewarder.syncQuarries();
         await rewarder.reload();
         expect(
@@ -519,8 +506,6 @@ describe('set-rewards', () => {
         rate: initialRate,
         quarryShares: initialShares,
       });
-      await multisig.reload();
-      expect(multisig.numTransactions.toString()).toBe('0');
 
       const shares = [3256, 5797]; // + intial_shares = 10000 total
       await expect([
@@ -544,14 +529,9 @@ describe('set-rewards', () => {
         stderr: '',
       });
 
-      await multisig.reload();
-      expect(multisig.numTransactions.toString()).not.toBe('0');
-
-      for (let i = 0; i < multisig.numTransactions.toNumber(); i++) {
-        await multisig.executeTransaction(
-          await multisig.transactionByIndex(new BN(i))
-        );
-      }
+      await expect(
+        multisig.executeAllPending().then(t => t.length)
+      ).resolves.toBeGreaterThan(0);
 
       await rewarder.syncQuarries();
 
@@ -606,25 +586,13 @@ describe('set-rewards', () => {
         stderr: '',
       });
 
-      await rateSetterMultisig.reload();
-      expect(rateSetterMultisig.numTransactions.toString()).not.toBe('0');
-      await shareAllocatorMultisig.reload();
-      expect(shareAllocatorMultisig.numTransactions.toString()).not.toBe('0');
+      await expect(
+        rateSetterMultisig.executeAllPending().then(t => t.length)
+      ).resolves.toBeGreaterThan(0);
 
-      for (let i = 0; i < rateSetterMultisig.numTransactions.toNumber(); i++) {
-        await rateSetterMultisig.executeTransaction(
-          await rateSetterMultisig.transactionByIndex(new BN(i))
-        );
-      }
-      for (
-        let i = 0;
-        i < shareAllocatorMultisig.numTransactions.toNumber();
-        i++
-      ) {
-        await shareAllocatorMultisig.executeTransaction(
-          await shareAllocatorMultisig.transactionByIndex(new BN(i))
-        );
-      }
+      await expect(
+        shareAllocatorMultisig.executeAllPending().then(t => t.length)
+      ).resolves.toBeGreaterThan(0);
 
       await rewarder.syncQuarries();
 

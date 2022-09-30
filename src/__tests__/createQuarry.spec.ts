@@ -212,12 +212,9 @@ describe('create-quarry', () => {
           stderr: '',
         });
 
-        await multisig.reload();
-        expect(multisig.numTransactions.eqn(2)).toBeTruthy();
-
-        await multisig.executeTransaction(
-          await multisig.transactionByIndex(new BN(1))
-        );
+        await expect(
+          multisig.executeAllPending().then(t => t.length)
+        ).resolves.toBeGreaterThan(0);
 
         const quarryWrapper = await rewarder.wrapper.getQuarry(
           Token.fromMint(mint.address, 9)
@@ -241,7 +238,7 @@ describe('create-quarry', () => {
             new KeypairSignerHelper(new Keypair()),
             new KeypairSignerHelper(new Keypair()),
           ],
-          threshold: new BN(2),
+          threshold: 2,
         });
         const rewarder = await RewarderHelper.create({
           sdk,
@@ -265,12 +262,9 @@ describe('create-quarry', () => {
           stderr: '',
         });
 
-        await multisig.reload();
-        expect(multisig.numTransactions.eqn(2)).toBeTruthy();
-
-        await multisig.executeTransaction(
-          await multisig.transactionByIndex(new BN(1))
-        );
+        await expect(
+          multisig.executeAllPending().then(t => t.length)
+        ).resolves.toBeGreaterThan(0);
 
         const quarryWrapper = await rewarder.wrapper.getQuarry(
           Token.fromMint(mint.address, 9)
@@ -310,12 +304,10 @@ describe('create-quarry', () => {
           stderr: '',
         });
 
-        await multisig.reload();
-        expect(multisig.numTransactions.eqn(1)).toBeTruthy();
+        await expect(
+          multisig.executeAllPending().then(t => t.length)
+        ).resolves.toBeGreaterThan(0);
 
-        await multisig.executeTransaction(
-          await multisig.transactionByIndex(new BN(0))
-        );
         const quarryWrapper = await rewarder.wrapper.getQuarry(
           Token.fromMint(mint.address, 9)
         );

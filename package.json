@@ -34,7 +34,7 @@
     "jsbi": "^4.3.0"
   },
   "devDependencies": {
-    "@marinade.finance/solana-test-utils": "^0.0.41",
+    "@marinade.finance/solana-test-utils": "^0.0.43",
     "@types/bn.js": "^5.1.0",
     "@types/jest": "^28.1.8",
     "@types/mz": "^2.7.4",
