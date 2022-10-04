@@ -176,6 +176,14 @@ export async function createQuarry({
     tx.addSigners(admin);
   }
 
+  const simulation = await tx.simulate();
+  if (simulate || simulation.value.err) {
+    console.log(tx.debugStr);
+    console.log(simulation.value.logs);
+  }
+  if (simulation.value.err) {
+    throw new Error(simulation.value.err.toString());
+  }
   for (const m of middleware) {
     tx = await m.apply(tx);
   }
@@ -190,10 +198,7 @@ export async function createQuarry({
     tx = createRegistryTx.combine(tx); // Prepend
   }
 
-  if (simulate) {
-    const result = await tx.simulate();
-    console.log(JSON.stringify(result.value));
-  } else {
+  if (tx.instructions.length !== 0 && !simulate) {
     const result = await tx.confirm();
     console.log(`Tx: ${result.signature}`);
   }

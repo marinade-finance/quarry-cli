@@ -296,6 +296,17 @@ export async function setRewards({
       }
     }
 
+    const simulation = await Promise.all(
+      setSharesTx.partition().map(p => p.simulate())
+    );
+    for (const s of simulation) {
+      if (simulate || s.value.err) {
+        console.log(s.value.logs);
+      }
+      if (s.value.err) {
+        throw new Error(s.value.err.toString());
+      }
+    }
     for (const m of middleware) {
       setSharesTx = await m.apply(setSharesTx);
     }
@@ -377,13 +388,18 @@ export async function setRewards({
       setRatesTx.addSigners(rateSetter);
     }
 
+    const simulation = await setRatesTx.simulate();
+    if (simulate || simulation.value.err) {
+      console.log(setRatesTx.debugStr);
+      console.log(simulation.value.logs);
+    }
+    if (simulation.value.err) {
+      throw new Error(simulation.value.err.toString());
+    }
     for (const m of middleware) {
       setRatesTx = await m.apply(setRatesTx);
     }
-    if (simulate) {
-      const result = await setRatesTx.simulate();
-      console.log(JSON.stringify(result.value));
-    } else {
+    if (setRatesTx.instructions.length !== 0 && !simulate) {
       const result = await setRatesTx.confirm();
       console.log(`Tx: ${result.signature}`);
     }
