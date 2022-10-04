@@ -176,6 +176,16 @@ export async function createQuarry({
     tx.addSigners(admin);
   }
 
+  if (!(await quarry.provider.getAccountInfo(registry))) {
+    console.log('Creating rewarder registry');
+    const { tx: createRegistryTx } = await quarry.registry.newRegistry({
+      numQuarries: 256,
+      rewarderKey: rewarder,
+      payer: rentPayer?.publicKey,
+    });
+    tx = createRegistryTx.combine(tx); // Prepend
+  }
+
   const simulation = await tx.simulate();
   if (simulate || simulation.value.err) {
     console.log(tx.debugStr);
@@ -186,16 +196,6 @@ export async function createQuarry({
   }
   for (const m of middleware) {
     tx = await m.apply(tx);
-  }
-
-  if (!(await quarry.provider.getAccountInfo(registry))) {
-    console.log('Creating rewarder registry');
-    const { tx: createRegistryTx } = await quarry.registry.newRegistry({
-      numQuarries: 256,
-      rewarderKey: rewarder,
-      payer: rentPayer?.publicKey,
-    });
-    tx = createRegistryTx.combine(tx); // Prepend
   }
 
   if (tx.instructions.length !== 0 && !simulate) {
