@@ -14,6 +14,7 @@ import {
   parseKeypair,
   parsePubkey,
   middleware as m,
+  parsePubkeyOrKeypair,
 } from '@marinade.finance/solana-cli-utils';
 import { KedgereeSDK } from '@marinade.finance/kedgeree-sdk';
 
@@ -30,7 +31,7 @@ export function installCreateQuarry(program: Command) {
     )
     .option('--stake <pubkey>', 'Stake token', parsePubkey)
     .option('--admin <keypair>', 'Authority', parseKeypair)
-    .option('--rent-payer <keypair>', 'Rent payer', parseKeypair)
+    .option('--rent-payer <keypair>', 'Rent payer', parsePubkeyOrKeypair)
     .option('--proposer <keypair>', 'Proposer', parseKeypair)
     .option('--log-only', 'Do not create multisig transaction')
     .option('--community', 'Create community proposal')
@@ -47,7 +48,7 @@ export function installCreateQuarry(program: Command) {
         rewarder: Promise<PublicKey>;
         stake: Promise<PublicKey>;
         admin?: Promise<Keypair>;
-        rentPayer?: Promise<Keypair>;
+        rentPayer?: Promise<Keypair | PublicKey>;
         proposer?: Promise<Keypair>;
         logOnly?: boolean;
         community?: boolean;
@@ -89,7 +90,7 @@ export async function createQuarry({
   rewarder: PublicKey;
   stake: PublicKey;
   admin?: Keypair;
-  rentPayer?: Keypair;
+  rentPayer?: Keypair | PublicKey;
   proposer?: Keypair;
   logOnly?: boolean;
   community?: boolean;
@@ -126,7 +127,6 @@ export async function createQuarry({
     kedgeree,
     address: quarryCreator,
     proposer,
-    rentPayer,
     logOnly,
     community,
   });
@@ -146,18 +146,34 @@ export async function createQuarry({
           },
           quarry: quarryAddress,
           tokenMint: stake,
-          payer: rentPayer?.publicKey,
+          payer:
+            rentPayer instanceof PublicKey ? rentPayer : rentPayer?.publicKey,
           systemProgram: SystemProgram.programId,
         })
         .instruction()
     );
   } else {
-    const { tx: createQuarryTx, quarry: quarryAddress } =
-      await rewarderWrapper.createQuarry({
-        token: Token.fromMint(stake, 9),
-        authority: quarryCreator,
-      });
-    tx = createQuarryTx;
+    const [quarryKey] = await findQuarryAddress(
+      rewarderWrapper.rewarderKey,
+      stake,
+      rewarderWrapper.program.programId
+    );
+    const ix = rewarderWrapper.program.instruction.createQuarryV2({
+      accounts: {
+        quarry: quarryKey,
+        auth: {
+          authority: quarryCreator,
+          rewarder: rewarderWrapper.rewarderKey,
+        },
+        tokenMint: stake,
+        payer:
+          rentPayer instanceof PublicKey
+            ? rentPayer
+            : rentPayer?.publicKey || quarry.provider.walletKey,
+        systemProgram: SystemProgram.programId,
+      },
+    });
+    tx = new TransactionEnvelope(quarry.provider, [ix]);
   }
 
   const [registry] = await findRegistryAddress(rewarder);
@@ -169,7 +185,7 @@ export async function createQuarry({
     })
   );
 
-  if (rentPayer) {
+  if (rentPayer && !(rentPayer instanceof PublicKey)) {
     tx.addSigners(rentPayer);
   }
   if (admin) {
@@ -181,7 +197,6 @@ export async function createQuarry({
     const { tx: createRegistryTx } = await quarry.registry.newRegistry({
       numQuarries: 256,
       rewarderKey: rewarder,
-      payer: rentPayer?.publicKey,
     });
     tx = createRegistryTx.combine(tx); // Prepend
   }

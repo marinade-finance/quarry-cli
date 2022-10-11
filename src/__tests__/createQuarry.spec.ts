@@ -16,9 +16,11 @@ import {
   KeypairSignerHelper,
   MULTISIG_FACTORIES,
 } from '@marinade.finance/solana-test-utils';
-import { MintHelper } from '@marinade.finance/solana-test-utils';
-import { RewarderHelper } from '@marinade.finance/solana-test-utils';
-import { OperatorHelper } from '@marinade.finance/solana-test-utils';
+import {
+  RewarderHelper,
+  OperatorHelper,
+  MintHelper,
+} from '@marinade.finance/solana-test-utils';
 import { KedgereeSDK } from '@marinade.finance/kedgeree-sdk';
 
 jest.setTimeout(300000);
@@ -206,7 +208,15 @@ describe('create-quarry', () => {
             rewarder.address.toBase58(),
             '--stake',
             mint.address.toBase58(),
-          ].concat(multisigFactory.side === 'community' ? ['--community'] : []),
+          ]
+            .concat(
+              multisig.rentPayer
+                ? ['--rent-payer', multisig.rentPayer.toBase58()]
+                : []
+            )
+            .concat(
+              multisigFactory.side === 'community' ? ['--community'] : []
+            ),
         ]).toHaveMatchingSpawnOutput({
           code: 0,
           stderr: '',
@@ -256,7 +266,15 @@ describe('create-quarry', () => {
             mint.address.toBase58(),
             '--proposer',
             proposerPath,
-          ].concat(multisigFactory.side === 'community' ? ['--community'] : []),
+          ]
+            .concat(
+              multisig.rentPayer
+                ? ['--rent-payer', multisig.rentPayer.toBase58()]
+                : []
+            )
+            .concat(
+              multisigFactory.side === 'community' ? ['--community'] : []
+            ),
         ]).toHaveMatchingSpawnOutput({
           code: 0,
           stderr: '',
@@ -298,7 +316,15 @@ describe('create-quarry', () => {
             rewarder.address.toBase58(),
             '--stake',
             mint.address.toBase58(),
-          ].concat(multisigFactory.side === 'community' ? ['--community'] : []),
+          ]
+            .concat(
+              multisig.rentPayer
+                ? ['--rent-payer', multisig.rentPayer.toBase58()]
+                : []
+            )
+            .concat(
+              multisigFactory.side === 'community' ? ['--community'] : []
+            ),
         ]).toHaveMatchingSpawnOutput({
           code: 0,
           stderr: '',
