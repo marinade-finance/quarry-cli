@@ -214,7 +214,9 @@ export async function createQuarry({
   }
 
   if (tx.instructions.length !== 0 && !simulate) {
-    const result = await tx.confirm();
-    console.log(`Tx: ${result.signature}`);
+    for (const part of tx.partition()) {
+      const result = await part.confirm();
+      console.log(`Tx: ${result.signature}`);
+    }
   }
 }
