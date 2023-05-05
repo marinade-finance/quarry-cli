@@ -1,8 +1,7 @@
-import { GokiSDK, SmartWalletWrapper } from '@gokiprotocol/client';
+import { GokiSDK } from '@gokiprotocol/client';
 import {
   Operator,
   QuarrySDK,
-  RewarderWrapper,
 } from '@quarryprotocol/quarry-sdk';
 import {
   TransactionEnvelope,
@@ -10,12 +9,10 @@ import {
 } from '@saberhq/solana-contrib';
 import {
   Keypair,
-  LAMPORTS_PER_SOL,
   PublicKey,
   RpcResponseAndContext,
   SimulatedTransactionResponse,
 } from '@solana/web3.js';
-import assert from 'assert';
 import BN from 'bn.js';
 import { Command } from 'commander';
 import { useContext } from './context';
@@ -128,6 +125,7 @@ export function installSetRewards(program: Command) {
           rateSetter: await rateSetter,
           rentPayer: await rentPayer,
           proposer: await proposer,
+          logOnly,
           community,
           simulate: context.simulate,
         });
