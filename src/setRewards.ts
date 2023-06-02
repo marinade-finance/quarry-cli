@@ -128,6 +128,7 @@ export function installSetRewards(program: Command) {
           rateSetter: await rateSetter,
           rentPayer: await rentPayer,
           proposer: await proposer,
+          logOnly,
           community,
           simulate: context.simulate,
         });
@@ -172,6 +173,7 @@ export async function setRewards({
   const quarries = await quarry.mine.program.account.quarry.all(
     rewarderWrapper.rewarderKey.toBuffer()
   );
+
   const shareMap = new Map<string, BN>();
   for (const quarryWrapper of quarries) {
     shareMap.set(
@@ -400,6 +402,8 @@ export async function setRewards({
       setRatesTx = await m.apply(setRatesTx);
     }
     if (setRatesTx.instructions.length !== 0 && !simulate) {
+      console.log(setRatesTx.debugStr);
+      console.log((await setRatesTx.simulate()).value.logs);
       const result = await setRatesTx.confirm();
       console.log(`Tx: ${result.signature}`);
     }
