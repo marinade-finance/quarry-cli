@@ -2,7 +2,7 @@ import { GokiSDK } from '@gokiprotocol/client';
 import { KedgereeSDK } from '@marinade.finance/kedgeree-sdk';
 import { QuarrySDK } from '@quarryprotocol/quarry-sdk';
 import { SignerWallet, SolanaProvider } from '@saberhq/solana-contrib';
-import { Connection, Keypair } from '@solana/web3.js';
+import { Cluster, Connection, Keypair, clusterApiUrl } from '@solana/web3.js';
 
 export interface Context {
   quarry: QuarrySDK;
@@ -32,6 +32,11 @@ export const setContext = ({
   walletKP: Keypair;
   simulate: boolean;
 }) => {
+  try {
+    cluster = clusterApiUrl(cluster as Cluster);
+  } catch (e) {
+    // ignore
+  }
   const provider = SolanaProvider.init({
     connection: new Connection(cluster, 'confirmed'),
     wallet: new SignerWallet(walletKP),

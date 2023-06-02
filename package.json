@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "cli": "node ./build/src/index.js",
+    "cli": "ts-node ./src/index.ts",
     "_test": "jest --detectOpenHandles --runInBand",
     "test": "pnpm compile && ts-node ./src/testHelpers/runner.ts",
     "lint": "gts lint",
